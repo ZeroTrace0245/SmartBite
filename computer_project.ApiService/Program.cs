@@ -15,11 +15,14 @@ builder.Services.AddResponseCompression();
 
 // Register AIService as singleton with its own HttpClient (bypasses Aspire's
 // standard resilience 10s timeout — local AI inference needs much longer)
+builder.AddAzureChatCompletionsClient("chatModel").AddChatClient();
 builder.Services.AddSingleton<AIService>();
 
-// Use SQLite for persistent, portable storage (just copy SmartBite.db to another device)
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlite("Data Source=SmartBite.db"));
+// Swap SQLite for PostgreSQL managed by Aspire
+builder.AddNpgsqlDbContext<AppDbContext>("smartbitedb");
+
+// Add Redis Distributed Caching automatically via Aspire
+builder.AddRedisDistributedCache("cache");
 
 var app = builder.Build();
 
@@ -41,14 +44,14 @@ using (var scope = app.Services.CreateScope())
     {
         db.Users.Add(new User { Username = "user", PasswordHash = "password", Role = "EndUser" });
         db.Users.Add(new User { Username = "Admin", PasswordHash = "Admin1234", Role = "Admin" });
-        db.UserGoals.Add(new UserGoal 
-        { 
-            UserId = 1, 
-            TargetCalories = 2200, 
-            TargetProtein = 160, 
-            TargetCarbs = 250, 
-            TargetFat = 70, 
-            TargetWater = 3.0 
+        db.UserGoals.Add(new UserGoal
+        {
+            UserId = 1,
+            TargetCalories = 2200,
+            TargetProtein = 160,
+            TargetCarbs = 250,
+            TargetFat = 70,
+            TargetWater = 3.0
         });
 
         // Add some random meals for the last 7 days
@@ -90,10 +93,10 @@ using (var scope = app.Services.CreateScope())
 // --- Endpoints ---
 
 // User
-app.MapGet("/users", async (AppDbContext db) => 
+app.MapGet("/users", async (AppDbContext db) =>
     await db.Users.AsNoTracking().ToListAsync());
 
-app.MapGet("/users/{id}", async (int id, AppDbContext db) => 
+app.MapGet("/users/{id}", async (int id, AppDbContext db) =>
     await db.Users.FindAsync(id) is User user ? Results.Ok(user) : Results.NotFound());
 
 app.MapPost("/users", async (UserRegistrationRequest request, AppDbContext db) =>
@@ -101,8 +104,9 @@ app.MapPost("/users", async (UserRegistrationRequest request, AppDbContext db) =
     if (await db.Users.AnyAsync(u => u.Username == request.Username))
         return Results.BadRequest("Username already exists");
 
-    var user = new User { 
-        Username = request.Username, 
+    var user = new User
+    {
+        Username = request.Username,
         PasswordHash = request.Password // Simple demo, no hashing
     };
     db.Users.Add(user);
@@ -133,13 +137,13 @@ app.MapPut("/users/{id}", async (int id, User updatedUser, AppDbContext db) =>
     user.Username = updatedUser.Username;
     user.Role = updatedUser.Role;
     // Password update omitted for simplicity or you can add it if needed
-    
+
     await db.SaveChangesAsync();
     return Results.NoContent();
 });
 
 // Meals
-app.MapGet("/meals", async (AppDbContext db) => 
+app.MapGet("/meals", async (AppDbContext db) =>
     await db.Meals.AsNoTracking().OrderByDescending(m => m.LoggedAt).ToListAsync());
 
 app.MapPost("/meals", async (Meal meal, AppDbContext db) =>
@@ -150,7 +154,7 @@ app.MapPost("/meals", async (Meal meal, AppDbContext db) =>
 });
 
 // Shopping List
-app.MapGet("/shoppinglist", async (AppDbContext db) => 
+app.MapGet("/shoppinglist", async (AppDbContext db) =>
     await db.ShoppingListItems.AsNoTracking().ToListAsync());
 
 app.MapPost("/shoppinglist", async (ShoppingListItem item, AppDbContext db) =>
@@ -164,7 +168,7 @@ app.MapPut("/shoppinglist/{id}", async (int id, ShoppingListItem inputItem, AppD
 {
     var item = await db.ShoppingListItems.FindAsync(id);
     if (item is null) return Results.NotFound();
-    
+
     item.IsPurchased = inputItem.IsPurchased;
     item.ItemName = inputItem.ItemName;
     item.Quantity = inputItem.Quantity;
@@ -186,7 +190,7 @@ app.MapDelete("/shoppinglist/{id}", async (int id, AppDbContext db) =>
 });
 
 // Stats / Reports
-app.MapGet("/stats", async (AppDbContext db, AIService ai) => 
+app.MapGet("/stats", async (AppDbContext db, AIService ai) =>
 {
     var stats = await db.Meals.GroupBy(_ => 1).Select(g => new
     {
@@ -199,7 +203,8 @@ app.MapGet("/stats", async (AppDbContext db, AIService ai) =>
 
     var goal = await db.UserGoals.AsNoTracking().FirstOrDefaultAsync(g => g.UserId == 1);
 
-    var report = new HealthReport {
+    var report = new HealthReport
+    {
         UserId = 1,
         TotalCalories = stats?.TotalCalories ?? 0,
         MealCount = stats?.MealCount ?? 0,
@@ -221,7 +226,7 @@ app.MapGet("/stats", async (AppDbContext db, AIService ai) =>
 });
 
 // AI Recommendations
-app.MapGet("/recommendations", async (AppDbContext db, AIService ai) => 
+app.MapGet("/recommendations", async (AppDbContext db, AIService ai) =>
 {
     try
     {
@@ -261,10 +266,10 @@ app.MapGet("/ai/status", async (AIService ai) =>
 });
 
 // Water Tracking
-app.MapGet("/water", async (AppDbContext db) => 
+app.MapGet("/water", async (AppDbContext db) =>
     await db.WaterIntakes.AsNoTracking().OrderByDescending(w => w.LoggedAt).ToListAsync());
 
-app.MapGet("/water/advice", async (double current, double target, AIService ai) => 
+app.MapGet("/water/advice", async (double current, double target, AIService ai) =>
 {
     try
     {
@@ -285,8 +290,8 @@ app.MapPost("/water", async (WaterIntake intake, AppDbContext db) =>
 
 // User Goals
 app.MapGet("/goals/{userId}", async (int userId, AppDbContext db) =>
-    await db.UserGoals.AsNoTracking().FirstOrDefaultAsync(g => g.UserId == userId) is UserGoal goal 
-        ? Results.Ok(goal) 
+    await db.UserGoals.AsNoTracking().FirstOrDefaultAsync(g => g.UserId == userId) is UserGoal goal
+        ? Results.Ok(goal)
         : Results.NotFound());
 
 app.MapPut("/goals/{userId}", async (int userId, UserGoal updatedGoal, AppDbContext db) =>
@@ -311,6 +316,7 @@ app.Run();
 record ChatRequest(string Prompt);
 public record UserRegistrationRequest(string Username, string Password);
 public record LoginRequest(string Username, string Password);
+
 
 
 

@@ -27,6 +27,7 @@ public class ShoppingListItem
     public string ItemName { get; set; } = string.Empty;
     public string? Quantity { get; set; }
     public bool IsPurchased { get; set; }
+    public string PaymentMethod { get; set; } = "Cash";
 }
 
 public class HealthReport
@@ -68,4 +69,7 @@ public class UserGoal
     public double TargetCarbs { get; set; }
     public double TargetFat { get; set; }
     public double TargetWater { get; set; }
+    public string TimeZoneId { get; set; } = "UTC";
+    public string Region { get; set; } = "Global";
+    public bool IsDarkMode { get; set; } = false;
 }

@@ -6,15 +6,17 @@
 @implements IDisposable
 
 <div class="page">
-    <div class="sidebar mica-effect @(sidebarShow ? "show" : "")">
+    <input type="checkbox" id="mobile-nav-toggle" class="d-none" autocomplete="off" />
+
+    <div class="sidebar mica-effect">
         <NavMenu />
     </div>
 
     <main>
         <div class="top-row px-2 px-md-4 border-bottom d-flex align-items-center mica-effect" style="height: 56px; background-color: var(--win11-surface); position: sticky; top: 0; z-index: 1000;">
-            <button class="btn btn-sm btn-link text-muted me-2 d-lg-none" @onclick="ToggleSidebar">
-                <i class="bi bi-list fs-4"></i>
-            </button>
+            <label for="mobile-nav-toggle" class="btn btn-sm btn-link text-muted me-2 d-lg-none pt-2" style="cursor: pointer;">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+            </label>
             <div class="d-flex align-items-center me-3 d-none d-sm-flex">
                 <a href="" class="text-decoration-none">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="text-primary" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
@@ -28,11 +30,30 @@
                 </a>
                 <a href="feedback" class="btn btn-sm btn-light border-0 fw-semibold d-flex align-items-center gap-2 px-3 rounded-pill acrylic-effect">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-                    <span>Contact Help</span>
+                    <span>Feedback</span>
                 </a>
+                <a href="settings" class="btn btn-sm btn-light border-0 fw-semibold d-flex align-items-center gap-2 px-3 rounded-pill acrylic-effect">
+                    <span>Settings</span>
+                </a>
+                <a href="help-support" class="btn btn-sm btn-light border-0 fw-semibold d-flex align-items-center gap-2 px-3 rounded-pill acrylic-effect">
+                    <span>Help/Support</span>
+                </a>
+                <a href="community" class="btn btn-sm btn-light border-0 fw-semibold d-flex align-items-center gap-2 px-3 rounded-pill acrylic-effect">
+                    <span>Community</span>
+                </a>
+                <a href="policies" class="btn btn-sm btn-light border-0 fw-semibold d-flex align-items-center gap-2 px-3 rounded-pill acrylic-effect">
+                    <span>Policies</span>
+                </a>
+                @if (Session.IsLoggedIn)
+                {
+                    <button class="btn btn-sm btn-light text-danger border-0 fw-semibold d-flex align-items-center gap-2 px-3 rounded-pill acrylic-effect ms-2" @onclick="HandleLogout">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" class="text-danger" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                        <span>Logout</span>
+                    </button>
+                }
             </div>
 
-            <div class="mx-auto flex-grow-1 flex-md-grow-0 text-center text-muted small fw-semibold px-2" style="min-width: 0; max-width: 700px;">
+            <div class="mx-auto flex-grow-1 flex-md-grow-0 text-center text-muted small fw-semibold px-2" style="min-width: 0; max-width: 300px;">
                 Keep going small steps add up. You’ve got this!
             </div>
 
@@ -40,14 +61,20 @@
                 <div class="d-flex align-items-center gap-1 border-end pe-2 pe-md-3 d-none d-sm-flex">
                     @if (Session.IsEndUser)
                     {
-                        <button class="btn btn-sm btn-link text-muted" title="Quick Log Meal"><i class="bi bi-plus-circle"></i></button>
-                        <button class="btn btn-sm btn-link text-muted" title="Log Water"><i class="bi bi-droplet"></i></button>
+                        <button class="btn btn-sm btn-link text-muted" title="Quick Log Meal">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg>
+                        </button>
+                        <button class="btn btn-sm btn-link text-muted" title="Log Water">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path></svg>
+                        </button>
                     }
                     else if (Session.IsAdmin)
                     {
                         <span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill me-2 px-3 fw-bold" style="font-size: 0.7rem;">ADMIN CONSOLE</span>
                     }
-                    <button class="btn btn-sm btn-link text-muted" title="Notifications"><i class="bi bi-bell"></i></button>
+                    <button class="btn btn-sm btn-link text-muted" title="Notifications">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+                    </button>
                 </div>
                 
                 @if (Session.IsLoggedIn)
@@ -83,15 +110,10 @@
         </div>
     </main>
 
-    @if (sidebarShow)
-    {
-        <div class="modal-backdrop fade show d-lg-none" style="z-index: 1500;" @onclick="ToggleSidebar"></div>
-    }
+    <label for="mobile-nav-toggle" class="modal-backdrop fade show w-100 h-100 mobile-nav-backdrop" style="z-index: 1500; cursor: pointer;"></label>
 </div>
 
 @code {
-    private bool sidebarShow = false;
-    private void ToggleSidebar() => sidebarShow = !sidebarShow;
 
     protected override void OnInitialized()
     {

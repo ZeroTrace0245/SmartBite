@@ -134,25 +134,231 @@
         }
         else
         {
-            <div class="card border-0 shadow-sm p-5 text-center fade-in">
-                <div class="mb-4">
-                    <i class="bi bi-lock-fill display-1 text-muted opacity-25"></i>
+            <!-- Consumer Settings -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white border-0 p-4">
+                    <h5 class="mb-0 fw-bold">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-2">
+                            <rect x="1" y="4" width="22" height="16" rx="2"/>
+                            <line x1="1" y1="10" x2="23" y2="10"/>
+                        </svg>
+                        Payment Method Preference
+                    </h5>
                 </div>
-                <h2 class="fw-bold">Administrative Access Only</h2>
-                <p class="text-muted lead px-lg-5">Regular users do not have permissions to access the system settings. Please contact your system administrator for assistance.</p>
-                <div class="mt-4">
-                    <a href="/" class="btn btn-outline-primary px-4">Back to Home</a>
+                <div class="card-body p-4">
+                    <p class="text-muted mb-4">Choose your default payment method for grocery shopping:</p>
+
+                    <div class="list-group list-group-flush">
+                        <label class="list-group-item d-flex align-items-center gap-3 border-0 py-3 cursor-pointer">
+                            <input class="form-check-input flex-shrink-0 m-0" type="radio" name="paymentMethod" value="Cash" checked="@(Session.PreferredPaymentMethod == "Cash")" @onchange='() => UpdatePaymentMethod("Cash")'>
+                            <div class="d-flex align-items-center gap-3 flex-grow-1">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <line x1="12" y1="1" x2="12" y2="23"/>
+                                    <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                                </svg>
+                                <div>
+                                    <div class="fw-bold">Cash</div>
+                                    <small class="text-muted">Pay with physical currency</small>
+                                </div>
+                            </div>
+                        </label>
+
+                        <label class="list-group-item d-flex align-items-center gap-3 border-0 py-3 cursor-pointer">
+                            <input class="form-check-input flex-shrink-0 m-0" type="radio" name="paymentMethod" value="Credit Card" checked="@(Session.PreferredPaymentMethod == "Credit Card")" @onchange='() => UpdatePaymentMethod("Credit Card")'>
+                            <div class="d-flex align-items-center gap-3 flex-grow-1">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="1" y="4" width="22" height="16" rx="2"/>
+                                    <line x1="1" y1="10" x2="23" y2="10"/>
+                                </svg>
+                                <div>
+                                    <div class="fw-bold">Credit Card</div>
+                                    <small class="text-muted">Debit or credit card payment</small>
+                                </div>
+                            </div>
+                        </label>
+
+                        <label class="list-group-item d-flex align-items-center gap-3 border-0 py-3 cursor-pointer">
+                            <input class="form-check-input flex-shrink-0 m-0" type="radio" name="paymentMethod" value="Apple Pay" checked="@(Session.PreferredPaymentMethod == "Apple Pay")" @onchange='() => UpdatePaymentMethod("Apple Pay")'>
+                            <div class="d-flex align-items-center gap-3 flex-grow-1">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M17.05 20.28c-.98.95-2.05.88-3.08.4-1.09-.5-2.08-.48-3.24 0-1.44.62-2.2.44-3.06-.4C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/>
+                                </svg>
+                                <div>
+                                    <div class="fw-bold">Apple Pay</div>
+                                    <small class="text-muted">Fast and secure with Apple devices</small>
+                                </div>
+                            </div>
+                        </label>
+
+                        <label class="list-group-item d-flex align-items-center gap-3 border-0 py-3 cursor-pointer">
+                            <input class="form-check-input flex-shrink-0 m-0" type="radio" name="paymentMethod" value="Google Pay" checked="@(Session.PreferredPaymentMethod == "Google Pay")" @onchange='() => UpdatePaymentMethod("Google Pay")'>
+                            <div class="d-flex align-items-center gap-3 flex-grow-1">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M12.48 10.92v3.28h7.84c-.24 1.84-.853 3.187-1.787 4.133-1.147 1.147-2.933 2.4-6.053 2.4-4.827 0-8.6-3.893-8.6-8.72s3.773-8.72 8.6-8.72c2.6 0 4.507 1.027 5.907 2.347l2.307-2.307C18.747 1.44 16.133 0 12.48 0 5.867 0 .307 5.387.307 12s5.56 12 12.173 12c3.573 0 6.267-1.173 8.373-3.36 2.16-2.16 2.84-5.213 2.84-7.667 0-.76-.053-1.467-.173-2.053H12.48z"/>
+                                </svg>
+                                <div>
+                                    <div class="fw-bold">Google Pay</div>
+                                    <small class="text-muted">Simple and secure Google payment</small>
+                                </div>
+                            </div>
+                        </label>
+
+                        <label class="list-group-item d-flex align-items-center gap-3 border-0 py-3 cursor-pointer">
+                            <input class="form-check-input flex-shrink-0 m-0" type="radio" name="paymentMethod" value="Bank Transfer" checked="@(Session.PreferredPaymentMethod == "Bank Transfer")" @onchange='() => UpdatePaymentMethod("Bank Transfer")'>
+                            <div class="d-flex align-items-center gap-3 flex-grow-1">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                                    <polyline points="9 22 9 12 15 12 15 22"/>
+                                </svg>
+                                <div>
+                                    <div class="fw-bold">Bank Transfer</div>
+                                    <small class="text-muted">Direct bank account transfer</small>
+                                </div>
+                            </div>
+                        </label>
+                    </div>
+
+                    <div class="alert alert-info border-0 mt-4 d-flex align-items-start gap-2">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="flex-shrink-0 mt-1">
+                            <circle cx="12" cy="12" r="10"/>
+                            <line x1="12" y1="16" x2="12" y2="12"/>
+                            <line x1="12" y1="8" x2="12.01" y2="8"/>
+                        </svg>
+                        <small>Your preferred payment method will be used as the default when adding new items to your shopping list.</small>
+                    </div>
                 </div>
+            </div>
+
+            <div class="card border-0 shadow-sm p-4 fade-in">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="mb-0 fw-bold">
+                        <i class="bi bi-smartwatch text-primary me-2"></i> Wearable & Health Integrations
+                    </h5>
+                </div>
+                <p class="text-muted small mb-4">Connect external health accounts to sync your daily steps, active calories, and workouts seamlessly into SmartBite.</p>
+
+                <div class="d-flex flex-column gap-3">
+                    <!-- Google Fit -->
+                    <div class="d-flex justify-content-between align-items-center p-3 border rounded-3 bg-light bg-opacity-50 hover-up">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="bg-white p-2 rounded shadow-sm d-flex align-items-center justify-content-center" style="width:48px;height:48px;">
+                                <i class="bi bi-google fs-4 text-danger"></i>
+                            </div>
+                            <div>
+                                <div class="fw-bold mb-1">Google Fit</div>
+                                @if (isGoogleFitConnected)
+                                {
+                                    <span class="badge bg-success bg-opacity-10 text-success border border-success"><i class="bi bi-check-circle me-1"></i> Connected</span>
+                                }
+                                else
+                                {
+                                    <span class="text-muted small">Not connected</span>
+                                }
+                            </div>
+                        </div>
+                        <button class="btn btn-sm @(isGoogleFitConnected ? "btn-outline-danger" : "btn-primary") px-3" disabled="@isConnecting" @onclick='() => ToggleConnection("GoogleFit")'>
+                            @if(isConnecting && activeConnect == "GoogleFit") { <span class="spinner-border spinner-border-sm"></span> }
+                            else { @(isGoogleFitConnected ? "Disconnect" : "Connect") }
+                        </button>
+                    </div>
+
+                    <!-- Apple Health -->
+                    <div class="d-flex justify-content-between align-items-center p-3 border rounded-3 bg-light bg-opacity-50 hover-up">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="bg-white p-2 rounded shadow-sm d-flex align-items-center justify-content-center" style="width:48px;height:48px;">
+                                <i class="bi bi-apple fs-4 text-dark"></i>
+                            </div>
+                            <div>
+                                <div class="fw-bold mb-1">Apple Health</div>
+                                @if (isAppleHealthConnected)
+                                {
+                                    <span class="badge bg-success bg-opacity-10 text-success border border-success"><i class="bi bi-check-circle me-1"></i> Connected</span>
+                                    <div class="small text-muted mt-1"><i class="bi bi-arrow-repeat"></i> Last synced: @DateTime.Now.AddMinutes(-5).ToString("g")</div>
+                                }
+                                else
+                                {
+                                    <span class="text-muted small">Not connected</span>
+                                }
+                            </div>
+                        </div>
+                        <button class="btn btn-sm @(isAppleHealthConnected ? "btn-outline-danger" : "btn-dark") px-3" disabled="@isConnecting" @onclick='() => ToggleConnection("AppleHealth")'>
+                            @if(isConnecting && activeConnect == "AppleHealth") { <span class="spinner-border spinner-border-sm"></span> }
+                            else { @(isAppleHealthConnected ? "Disconnect" : "Connect") }
+                        </button>
+                    </div>
+
+                    <!-- Fitbit -->
+                    <div class="d-flex justify-content-between align-items-center p-3 border rounded-3 bg-light bg-opacity-50 hover-up">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="bg-white p-2 rounded shadow-sm d-flex align-items-center justify-content-center" style="width:48px;height:48px;">
+                                <i class="bi bi-activity fs-4 text-info"></i>
+                            </div>
+                            <div>
+                                <div class="fw-bold mb-1">Fitbit</div>
+                                @if (isFitbitConnected)
+                                {
+                                    <span class="badge bg-success bg-opacity-10 text-success border border-success"><i class="bi bi-check-circle me-1"></i> Connected</span>
+                                }
+                                else
+                                {
+                                    <span class="text-muted small">Not connected</span>
+                                }
+                            </div>
+                        </div>
+                        <button class="btn btn-sm @(isFitbitConnected ? "btn-outline-danger" : "btn-info text-white") px-3" disabled="@isConnecting" @onclick='() => ToggleConnection("Fitbit")'>
+                            @if(isConnecting && activeConnect == "Fitbit") { <span class="spinner-border spinner-border-sm"></span> }
+                            else { @(isFitbitConnected ? "Disconnect" : "Connect") }
+                        </button>
+                    </div>
+                </div>
+
+                @if (isAppleHealthConnected || isGoogleFitConnected || isFitbitConnected)
+                {
+                    <div class="alert alert-success border-0 mt-4 d-flex align-items-start gap-2 mb-0">
+                        <i class="bi bi-cloud-arrow-down-fill text-success fs-5"></i>
+                        <small>A background service is actively running and polling your connected devices for biometric data every 15 minutes.</small>
+                    </div>
+                }
             </div>
         }
     </div>
 </div>
+
+<style>
+    .cursor-pointer { cursor: pointer; }
+    .cursor-pointer:hover { background-color: rgba(0,0,0,0.02); }
+</style>
 
 @code {
     private UserGoal? goal;
     private bool isSaving = false;
     private List<User>? allUsers;
     private User? editingUser;
+
+    // Wearable Integration States
+    private bool isConnecting = false;
+    private string activeConnect = "";
+    private bool isGoogleFitConnected = false;
+    private bool isAppleHealthConnected = true; // Pre-connected for demo
+    private bool isFitbitConnected = false;
+
+    private async Task ToggleConnection(string provider)
+    {
+        isConnecting = true;
+        activeConnect = provider;
+        StateHasChanged();
+
+        // Simulate OAuth handshake & redirect latency
+        await Task.Delay(1500);
+
+        if (provider == "GoogleFit") isGoogleFitConnected = !isGoogleFitConnected;
+        if (provider == "AppleHealth") isAppleHealthConnected = !isAppleHealthConnected;
+        if (provider == "Fitbit") isFitbitConnected = !isFitbitConnected;
+
+        isConnecting = false;
+        activeConnect = "";
+        StateHasChanged();
+    }
 
     protected override async Task OnInitializedAsync()
     {
@@ -167,6 +373,12 @@
         {
             await LoadUsers();
         }
+    }
+
+    private void UpdatePaymentMethod(string method)
+    {
+        Session.PreferredPaymentMethod = method;
+        Session.NotifyStateChanged();
     }
 
     private async Task LoadUsers()

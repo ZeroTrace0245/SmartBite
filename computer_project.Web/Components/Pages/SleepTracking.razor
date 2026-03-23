@@ -1,0 +1,227 @@
+@page "/sleep"
+@using computer_project.Web.Services
+@inject UserSession Session
+@rendermode InteractiveServer
+
+<PageTitle>Sleep Tracker - SmartBite</PageTitle>
+
+<div class="px-md-4 py-4">
+    <div class="d-flex justify-content-between align-items-end mb-4">
+        <div>
+            <div class="breadcrumb-small mb-1 text-uppercase ls-widest fw-bold opacity-75 text-primary">Wellness Tools</div>
+            <h1 class="display-6 fw-bold mb-0">Sleep Tracking</h1>
+        </div>
+    </div>
+
+    <!-- Sleep Inputs -->
+    <div class="card p-4 border-0 shadow-sm mica-effect mb-4 rounded-4">
+        <h5 class="fw-bold mb-3 d-flex align-items-center"><svg width="24" height="24" class="me-2 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg> Daily Sleep Horizon</h5>
+        <div class="row g-3 align-items-center">
+            <div class="col-md-5">
+                <label class="form-label small fw-bold text-muted">Bedtime</label>
+                <input type="time" class="form-control form-control-lg bg-light" @bind="bedtime" />
+            </div>
+            <div class="col-md-5">
+                <label class="form-label small fw-bold text-muted">Wake-up Time</label>
+                <input type="time" class="form-control form-control-lg bg-light" @bind="wakeupTime" />
+            </div>
+            <div class="col-md-2 mt-auto">
+                <button class="btn btn-primary w-100 py-2" @onclick="CalculateSleep">Analyze</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Results Overview -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-6">
+            <div class="card p-4 border-2 shadow-sm rounded-4 h-100 @(isGoodSleep ? "border-success" : "border-danger")">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <div class="text-muted small fw-bold mb-2 text-uppercase ls-wide">Total Duration</div>
+                        <div class="display-5 fw-bold mb-1 @(isGoodSleep ? "text-success" : "text-danger")">
+                            @totalSleepHours.ToString("F1") <span class="h5 text-muted fw-normal">hrs</span>
+                        </div>
+                        <div class="small fw-bold @(isGoodSleep ? "text-success" : "text-danger")">
+                            @if (isGoodSleep)
+                            {
+                                <span><i class="bi bi-check-circle-fill me-1"></i> Optimal Sleep Window!</span>
+                            }
+                            else
+                            {
+                                <span><i class="bi bi-exclamation-triangle-fill me-1"></i> Target is 7-9 hours.</span>
+                            }
+                        </div>
+                    </div>
+                    <div class="stat-card-icon @(isGoodSleep ? "bg-success" : "bg-danger") bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center" style="width: 64px; height: 64px;">
+                        @if (isGoodSleep)
+                        {
+                            <svg width="32" height="32" class="text-success" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                        }
+                        else
+                        {
+                            <svg width="32" height="32" class="text-danger" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card p-4 border-0 shadow-sm rounded-4 h-100 bg-light">
+                <h6 class="fw-bold mb-3 d-flex justify-content-between">
+                    <span>Average Quality</span>
+                    <span class="badge bg-primary">Last 7 Days</span>
+                </h6>
+                <div class="d-flex align-items-center gap-3 mb-2">
+                    <div class="fs-1 fw-bold">81<span class="fs-6 text-muted fw-normal">%</span></div>
+                    <div class="flex-grow-1">
+                        <div class="progress" style="height: 8px;">
+                            <div class="progress-bar bg-primary" role="progressbar" style="width: 81%;"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="small text-muted mb-0">Your sleep quality is considered <strong>Good</strong> based on restlessness, heart rate variance, and deep sleep percentage.</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Timeline Data -->
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
+        <div class="card-header bg-white border-bottom p-4">
+            <h5 class="fw-bold mb-0">Tonight's Projected Timeline</h5>
+        </div>
+        <div class="card-body p-0">
+            <ul class="list-group list-group-flush list-group-timeline">
+                @foreach (var stage in sleepStages)
+                {
+                    <li class="list-group-item p-4 d-flex gap-3 align-items-center border-bottom-0">
+                        <div class="text-end" style="width: 80px;">
+                            <div class="small fw-bold">@stage.Time.ToString("hh:mm tt")</div>
+                        </div>
+                        <div class="timeline-dot @GetStageColor(stage.Stage) rounded-circle" style="width: 12px; height: 12px;"></div>
+                        <div>
+                            <div class="fw-bold">@stage.Stage</div>
+                            <div class="small text-muted">@stage.Description</div>
+                        </div>
+                    </li>
+                }
+            </ul>
+        </div>
+    </div>
+</div>
+
+<style>
+    .list-group-timeline .list-group-item {
+        position: relative;
+    }
+    .list-group-timeline .list-group-item::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 101px; /* aligns with the timeline dot */
+        width: 2px;
+        background-color: #e9ecef;
+        z-index: 0;
+    }
+    .list-group-timeline .list-group-item:first-child::before {
+        top: 50%;
+    }
+    .list-group-timeline .list-group-item:last-child::before {
+        bottom: 50%;
+    }
+    .timeline-dot {
+        position: relative;
+        z-index: 1;
+        border: 2px solid white;
+        box-shadow: 0 0 0 1px rgba(0,0,0,0.1);
+    }
+</style>
+
+@code {
+    private TimeOnly bedtime = new TimeOnly(21, 0, 0); // 9:00 PM
+    private TimeOnly wakeupTime = new TimeOnly(6, 0, 0); // 6:00 AM
+
+    private double totalSleepHours;
+    private bool isGoodSleep;
+
+    private List<SleepStage> sleepStages = new();
+
+    protected override void OnInitialized()
+    {
+        CalculateSleep();
+    }
+
+    private void CalculateSleep()
+    {
+        // Calculate duration correctly even if it wraps over midnight
+        var duration = wakeupTime - bedtime;
+        if (duration.TotalHours < 0)
+        {
+            duration = duration.Add(TimeSpan.FromHours(24));
+        }
+
+        totalSleepHours = duration.TotalHours;
+
+        // Good sleep is between 7 and 9 hours
+        isGoodSleep = totalSleepHours >= 7 && totalSleepHours <= 9;
+
+        GenerateRandomStages();
+    }
+
+    private void GenerateRandomStages()
+    {
+        sleepStages.Clear();
+        var random = new Random();
+        var currentTime = bedtime;
+
+        // Start (Awake to Light Sleep)
+        sleepStages.Add(new SleepStage { Time = currentTime, Stage = "Fell Asleep", Description = "Transitioning into light sleep." });
+
+        // Generate intermediate periods
+        var segments = (int)totalSleepHours * 2; // Rough segments (approx every 30 mins to an hour)
+        var totalMinutes = (int)(totalSleepHours * 60);
+        var averageSegmentMinutes = totalMinutes / Math.Max(1, segments);
+
+        for (int i = 1; i < segments; i++)
+        {
+            var addMins = random.Next((int)(averageSegmentMinutes * 0.8), (int)(averageSegmentMinutes * 1.5));
+            currentTime = currentTime.AddMinutes(addMins);
+
+            if (currentTime >= wakeupTime && bedtime > wakeupTime && currentTime > bedtime) break; // Safe bounds
+
+            var stages = new[] { "Deep Sleep", "Light Sleep", "REM Sleep", "Awake (Brief)" };
+            var selected = stages[random.Next(stages.Length)];
+
+            string desc = selected switch
+            {
+                "Deep Sleep" => "Physical restoration and memory consolidation.",
+                "Light Sleep" => "Processing memories and emotions.",
+                "REM Sleep" => "Dreaming and cognitive maintenance.",
+                _ => "Brief moment of restlessness."
+            };
+
+            sleepStages.Add(new SleepStage { Time = currentTime, Stage = selected, Description = desc });
+        }
+
+        // End
+        sleepStages.Add(new SleepStage { Time = wakeupTime, Stage = "Woke Up", Description = "Cycle completed." });
+    }
+
+    private string GetStageColor(string stage) => stage switch
+    {
+        "Deep Sleep" => "bg-primary",
+        "Light Sleep" => "bg-info",
+        "REM Sleep" => "bg-success",
+        "Woke Up" => "bg-warning",
+        "Fell Asleep" => "bg-secondary",
+        _ => "bg-danger"
+    };
+
+    public class SleepStage
+    {
+        public TimeOnly Time { get; set; }
+        public string Stage { get; set; } = string.Empty;
+        public string Description { get; set; } = string.Empty;
+    }
+}

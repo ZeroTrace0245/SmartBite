@@ -1,66 +1,152 @@
 @page "/labs"
 @rendermode InteractiveServer
 
-<PageTitle>Labs</PageTitle>
+<PageTitle>Labs - SmartBite</PageTitle>
 
-<div class="container py-5">
-    <div class="text-center mb-4">
-        <span class="badge bg-warning text-dark text-uppercase">Experimental</span>
-        <h1 class="display-6 fw-bold mt-2 labs-hero-title">Labs</h1>
-        <p class="labs-hero-subtitle">Work in progress. Features here are previews and may change or break.</p>
+<div class="container py-5 anim-fade-in" style="max-width: 900px;">
+    <div class="text-center mb-5">
+        <div class="mb-3 d-inline-flex bg-warning bg-opacity-10 p-3 rounded-circle text-warning border border-warning border-opacity-50 shadow-sm">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a1 1 0 0 0 .86 1.5h18.64a1 1 0 0 0 .86-1.5L13.71 3.86a1 1 0 0 0-1.72 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        </div>
+        <h1 class="display-5 fw-bold mb-2" style="color: #24292f;">SmartBite Labs</h1>
+        <p class="text-muted lead" style="max-width: 650px; margin: 0 auto;">
+            Welcome to the experimental zone. Try out cutting-edge functionality before it ships to everyone. <br/>
+            <span class="badge bg-warning text-dark mt-2 fw-bold">Warning: Things might break!</span>
+        </p>
     </div>
 
-    <div class="row g-4 justify-content-center">
-        <div class="col-lg-8">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body p-4">
-                    <div class="d-flex align-items-center gap-3 mb-3">
-                        <div class="bg-warning bg-opacity-25 text-warning rounded-circle d-flex align-items-center justify-content-center" style="width:40px; height:40px;">
-                            <i class="bi bi-exclamation-triangle-fill"></i>
+    <!-- Alert / Banner -->
+    <div class="alert alert-dismissible fade show border-0 shadow-sm mb-5 d-flex align-items-center gap-3" role="alert" style="background-color: #f6f8fa;">
+        <div class="bg-dark text-white rounded-circle d-flex align-items-center justify-content-center p-2">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" class="text-success" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        </div>
+        <div>
+            <h6 class="fw-bold mb-1">Your feedback shapes SmartBite!</h6>
+            <span class="small text-muted">Join the Community tab to discuss these experimental features with the developer team.</span>
+        </div>
+        <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+
+    <!-- Labs Grid -->
+    <div class="row g-4">
+        <!-- Feature 1 -->
+        <div class="col-md-6">
+            <div class="card h-100 shadow-sm border-0 lab-card position-relative overflow-hidden" 
+                 style="background-color: #fff; transition: transform 0.2s; border: 1px solid #d0d7de !important;"
+                 onmouseover="this.style.transform='translateY(-4px)'" onmouseout="this.style.transform='translateY(0)'">
+                <div class="position-absolute top-0 start-0 w-100 bg-primary" style="height: 4px; @(!featAdaptivePlan ? "display: none;" : "")"></div>
+                
+                <div class="card-body p-4 d-flex flex-column">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center" style="width: 48px; height: 48px;">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg>
                         </div>
-                        <div>
-                            <h5 class="mb-1 fw-bold">Experimental Zone</h5>
-                            <div class="text-muted small">Use at your own risk. Feedback welcome!</div>
-                        </div>
+                        <span class="badge bg-secondary">Alpha</span>
                     </div>
+                    <h5 class="fw-bold mb-2">Adaptive Meal Planner</h5>
+                    <p class="text-muted small flex-grow-1">Automatically rotates meal plans based on your recent logs, available grocery list items, and calorie burn from workouts.</p>
+                    <div class="form-check form-switch mt-3 d-flex align-items-center gap-3 pt-3 border-top">
+                        <input class="form-check-input" type="checkbox" role="switch" id="labSwitch1" @bind="featAdaptivePlan" style="cursor: pointer; width: 44px; height: 22px;">
+                        <label class="form-check-label fw-bold small @(featAdaptivePlan ? "text-primary" : "text-muted")" for="labSwitch1" style="cursor: pointer;">
+                            @(featAdaptivePlan ? "Feature Enabled" : "Opt-in to Feature")
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-                    <ul class="list-group list-group-flush">
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                            <div>
-                                <div class="fw-bold">AI Coach (coming back soon)</div>
-                                <div class="small text-muted">Chat-based suggestions will return here with safety checks.</div>
-                            </div>
-                            <span class="badge bg-secondary">Queued</span>
-                        </li>
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                            <div>
-                                <div class="fw-bold">Adaptive Meal Planner</div>
-                                <div class="small text-muted">Rotates meal plans based on your recent logs and calories.</div>
-                            </div>
-                            <span class="badge bg-info text-dark">Planned</span>
-                        </li>
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                            <div>
-                                <div class="fw-bold">Hydration Streaks</div>
-                                <div class="small text-muted">Daily streaks and reminders to keep water tracking fun.</div>
-                            </div>
-                            <span class="badge bg-primary">In Design</span>
-                        </li>
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                            <div>
-                                <div class="fw-bold">Focused Mode Banner</div>
-                                <div class="small text-muted">Quick motivation in the top bar to keep you on track.</div>
-                            </div>
-                            <span class="badge bg-success">Live</span>
-                        </li>
-                    </ul>
+        <!-- Feature 2 -->
+        <div class="col-md-6">
+            <div class="card h-100 shadow-sm border-0 lab-card position-relative overflow-hidden" 
+                 style="background-color: #fff; transition: transform 0.2s; border: 1px solid #d0d7de !important;"
+                 onmouseover="this.style.transform='translateY(-4px)'" onmouseout="this.style.transform='translateY(0)'">
+                <div class="position-absolute top-0 start-0 w-100 bg-success" style="height: 4px; @(!featAiVision ? "display: none;" : "")"></div>
+                
+                <div class="card-body p-4 d-flex flex-column">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div class="bg-success bg-opacity-10 text-success rounded-circle d-flex align-items-center justify-content-center" style="width: 48px; height: 48px;">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                        </div>
+                        <span class="badge bg-warning text-dark">Beta</span>
+                    </div>
+                    <h5 class="fw-bold mb-2">AI Vision Fridge Scanner</h5>
+                    <p class="text-muted small flex-grow-1">Upload a photo of your fridge, and use GitHub Models to strictly identify individual food items to inject into your SmartBite inventory.</p>
+                    <div class="form-check form-switch mt-3 d-flex align-items-center gap-3 pt-3 border-top">
+                        <input class="form-check-input" type="checkbox" role="switch" id="labSwitch2" @bind="featAiVision" style="cursor: pointer; width: 44px; height: 22px;">
+                        <label class="form-check-label fw-bold small @(featAiVision ? "text-success" : "text-muted")" for="labSwitch2" style="cursor: pointer;">
+                            @(featAiVision ? "Feature Enabled" : "Opt-in to Feature")
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-                    <div class="alert alert-warning mt-4 mb-0" role="alert">
-                        <i class="bi bi-gear-wide-connected me-2"></i>
-                        Labs is under active construction. Expect rough edges.
+        <!-- Feature 3 -->
+        <div class="col-md-6">
+            <div class="card h-100 shadow-sm border-0 lab-card position-relative overflow-hidden" 
+                 style="background-color: #f8f9fa; border: 1px solid #d0d7de !important;">
+                <div class="card-body p-4 d-flex flex-column opacity-75">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div class="bg-secondary bg-opacity-10 text-secondary rounded-circle d-flex align-items-center justify-content-center" style="width: 48px; height: 48px;">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+                        </div>
+                        <span class="badge bg-light text-dark border">Coming Soon</span>
+                    </div>
+                    <h5 class="fw-bold mb-2 text-muted">Wearable Sync (HealthKit)</h5>
+                    <p class="text-muted small flex-grow-1 mb-4">Directly connect your Apple Watch or Garmin to automatically log workout volumes, steps, and dynamically alter your caloric limits.</p>
+                    <div class="mt-auto pt-3 border-top">
+                        <button class="btn btn-sm btn-outline-secondary w-100 disabled">Not Yet Available</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Feature 4 -->
+        <div class="col-md-6">
+            <div class="card h-100 shadow-sm border-0 lab-card position-relative overflow-hidden" 
+                 style="background-color: #fff; transition: transform 0.2s; border: 1px solid #d0d7de !important;"
+                 onmouseover="this.style.transform='translateY(-4px)'" onmouseout="this.style.transform='translateY(0)'">
+                <div class="position-absolute top-0 start-0 w-100 bg-info" style="height: 4px; @(!featHydrationStreaks ? "display: none;" : "")"></div>
+                
+                <div class="card-body p-4 d-flex flex-column">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div class="bg-info bg-opacity-10 text-info rounded-circle d-flex align-items-center justify-content-center" style="width: 48px; height: 48px;">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>
+                        </div>
+                        <span class="badge bg-success">Live preview</span>
+                    </div>
+                    <h5 class="fw-bold mb-2">Gamified Hydration Streaks</h5>
+                    <p class="text-muted small flex-grow-1">Keep track of your consecutive days reaching your water target and unlock hidden icons on your dashboard.</p>
+                    <div class="form-check form-switch mt-3 d-flex align-items-center gap-3 pt-3 border-top">
+                        <input class="form-check-input" type="checkbox" role="switch" id="labSwitch4" @bind="featHydrationStreaks" style="cursor: pointer; width: 44px; height: 22px;">
+                        <label class="form-check-label fw-bold small @(featHydrationStreaks ? "text-info" : "text-muted")" for="labSwitch4" style="cursor: pointer;">
+                            @(featHydrationStreaks ? "Feature Enabled" : "Opt-in to Feature")
+                        </label>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<style>
+    .anim-fade-in {
+        animation: fadeIn 0.5s ease-in-out forwards;
+    }
+    @@keyframes fadeIn {
+        from { opacity: 0; transform: translateY(15px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    /* Smooth toggle behavior */
+    .form-check-input:checked {
+        background-color: #24292f;
+        border-color: #24292f;
+    }
+</style>
+
+@code {
+    // State simulating user settings preferences for experimental features
+    private bool featAdaptivePlan = true;
+    private bool featAiVision = false;
+    private bool featHydrationStreaks = true;
+}

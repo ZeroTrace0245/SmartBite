@@ -1,0 +1,62 @@
+@page "/recovery"
+@using computer_project.Web.Services
+@inject UserSession Session
+@rendermode InteractiveServer
+
+<PageTitle>Recovery - SmartBite</PageTitle>
+
+<div class="px-md-4 py-4">
+    <div class="d-flex justify-content-between align-items-end mb-4">
+        <div>
+            <div class="breadcrumb-small mb-1 text-uppercase ls-widest fw-bold opacity-75 text-danger">Gym Focus</div>
+            <h1 class="display-6 fw-bold mb-0">Recovery Status</h1>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <div class="col-md-6">
+            <div class="card p-4 border-0 shadow-sm border-bottom border-danger border-3 h-100 text-center">
+                <div class="text-muted small fw-bold mb-4 text-uppercase ls-wide">Central Nervous System (CNS)</div>
+                <div class="position-relative d-inline-block mx-auto mb-3" style="width: 150px; height: 150px;">
+                    <svg viewBox="0 0 36 36" class="circular-chart text-danger">
+                        <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#f8f9fa" stroke-width="3" />
+                        <path class="circle" stroke-dasharray="92, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
+                    </svg>
+                    <div class="position-absolute top-50 start-50 translate-middle text-center">
+                        <div class="display-5 fw-bold mb-0 lh-1">92<span class="fs-5">%</span></div>
+                    </div>
+                </div>
+                <h5 class="fw-bold text-success"><i class="bi bi-stars"></i> Fully Recovered</h5>
+                <p class="small text-muted mb-0">Your muscles and CNS are primed for another heavy lifting session.</p>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card p-4 border-0 shadow-sm h-100">
+                <h6 class="fw-bold mb-3">Strain Tracking</h6>
+                <div class="d-flex justify-content-between align-items-center mb-2 small fw-bold">
+                    <span>Muscle Fatigue</span>
+                    <span class="text-warning">Low (12%)</span>
+                </div>
+                <div class="progress mb-4" style="height: 6px;">
+                    <div class="progress-bar bg-warning" style="width: 12%"></div>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center mb-2 small fw-bold">
+                    <span>Sleep Debt</span>
+                    <span class="text-success">Optimal (0h)</span>
+                </div>
+                <div class="progress mb-4" style="height: 6px;">
+                    <div class="progress-bar bg-success" style="width: 100%"></div>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center mb-2 small fw-bold">
+                    <span>Resting Heart Rate</span>
+                    <span class="text-success">54 bpm</span>
+                </div>
+                <div class="progress mb-0" style="height: 6px;">
+                    <div class="progress-bar bg-success" style="width: 100%"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

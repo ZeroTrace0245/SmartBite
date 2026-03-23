@@ -1,49 +1,48 @@
 using computer_project.ApiService.Models;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using System.Text;
+using Microsoft.Extensions.AI;
 
 namespace computer_project.ApiService.Services;
 
 public class AIService
 {
-    private readonly HttpClient _httpClient;
+    private readonly IChatClient _chatClient;
     private readonly ILogger<AIService> _logger;
-    private readonly string _apiKey;
-    private readonly string _model;
 
-    public AIService(HttpClient httpClient, IConfiguration configuration, ILogger<AIService> logger)
+    private static readonly JsonSerializerOptions s_jsonOptions = new()
     {
-        _httpClient = httpClient;
+        PropertyNameCaseInsensitive = true
+    };
+
+    public AIService(IChatClient chatClient, ILogger<AIService> logger)
+    {
+        _chatClient = chatClient;
         _logger = logger;
-        var section = configuration.GetSection("GoogleAI");
-        _apiKey = section["ApiKey"] ?? throw new InvalidOperationException("GoogleAI:ApiKey is missing");
-        _model = section["Model"] ?? "gemini-1.5-flash";
     }
 
     public async Task<string> GetChatResponseAsync(string prompt)
     {
         try
         {
-            var requestBody = new
+            var systemInstructions = @"You are the SmartBite AI Engine powered by GitHub Models. Provide personalized, highly-structured advice across three core pathways:
+1. Diet-Focused: Generate meal plans, macro targets, portion sizes, and grocery list integrations.
+2. Gym-Focused: Suggest customized workout routines (strength, HIIT), calorie burn matching, and progressive overload.
+3. General Wellness: Provide daily lifestyle routines (hydration, sleep hygiene, step goals).
+Format all responses beautifully using Markdown. Be concise but actionable.";
+
+            var messages = new List<ChatMessage>
             {
-                contents = new[]
-                {
-                    new { parts = new[] { new { text = prompt } } }
-                }
+                new ChatMessage(ChatRole.System, systemInstructions),
+                new ChatMessage(ChatRole.User, prompt)
             };
 
-            var response = await _httpClient.PostAsJsonAsync(
-                $"https://generativelanguage.googleapis.com/v1beta/models/{_model}:generateContent?key={_apiKey}",
-                requestBody);
-
-            response.EnsureSuccessStatusCode();
-            var result = await response.Content.ReadFromJsonAsync<GeminiResponse>();
-            return result?.Candidates?[0].Content.Parts[0].Text.Trim() ?? "No response from AI.";
+            var response = await _chatClient.GetResponseAsync(messages, new ChatOptions { MaxOutputTokens = 1000, Temperature = 0.7f });
+            return response.Text?.Trim() ?? "No response from AI.";
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error calling Google AI");
+            _logger.LogError(ex, "Error calling GitHub Models API");
             return $"AI is currently unavailable. Error: {ex.Message}";
         }
     }
@@ -60,7 +59,7 @@ public class AIService
             var content = await GetChatResponseAsync(prompt);
             content = CleanJsonResponse(content);
 
-            return JsonSerializer.Deserialize<MealNutritionStub>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            return JsonSerializer.Deserialize<MealNutritionStub>(content, s_jsonOptions);
         }
         catch (Exception ex)
         {
@@ -76,7 +75,7 @@ public class AIService
         try
         {
             var mealSummary = string.Join(", ", recentMeals.Select(m => $"{m.Name} ({m.Calories} kcal)"));
-            var goalSummary = goal != null 
+            var goalSummary = goal != null
                 ? $"Goal: {goal.TargetCalories} kcal, P: {goal.TargetProtein}g, C: {goal.TargetCarbs}g, F: {goal.TargetFat}g"
                 : "No specific goal set.";
 
@@ -87,7 +86,7 @@ public class AIService
             var content = await GetChatResponseAsync(prompt);
             content = CleanJsonResponse(content);
 
-            return JsonSerializer.Deserialize<List<AIRecommendation>>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true }) ?? [];
+            return JsonSerializer.Deserialize<List<AIRecommendation>>(content, s_jsonOptions) ?? [];
         }
         catch (Exception ex)
         {
@@ -140,27 +139,17 @@ public class AIService
         return content;
     }
 
-    private class GeminiResponse
+    public async Task<object> CheckStatusAsync()
     {
-        [JsonPropertyName("candidates")]
-        public Candidate[]? Candidates { get; set; }
-
-        public class Candidate
+        try
         {
-            [JsonPropertyName("content")]
-            public Content Content { get; set; } = null!;
+            // Simple ping to check status
+            await _chatClient.GetResponseAsync([new ChatMessage(ChatRole.User, "ping")], new ChatOptions { MaxOutputTokens = 1 });
+            return new { Status = "online", Endpoint = "GitHub Models API (MEAI)", Model = "gpt-4o-mini" };
         }
-
-        public class Content
+        catch
         {
-            [JsonPropertyName("parts")]
-            public Part[] Parts { get; set; } = null!;
-        }
-
-        public class Part
-        {
-            [JsonPropertyName("text")]
-            public string Text { get; set; } = null!;
+            return new { Status = "offline", Endpoint = "GitHub Models API (MEAI)" };
         }
     }
 }
