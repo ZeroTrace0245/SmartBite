@@ -6,7 +6,7 @@ SmartBite is a Blazor Server health and fitness companion built on .NET 11.
 
 > To test out the mobile version (Android only) please visit to the [Release Page](https://github.com/ZeroTrace0245/SmartBite/releases/tag/v0.1.3-alpha)
 
-> To test out the web application please visit to the [web sites](https://webfrontend.victoriousbush-9c923eb9.southeastasia.azurecontainerapps.io)
+> To test out the web application please visit to the [SmartBite](https://webfrontend.victoriousbush-9c923eb9.southeastasia.azurecontainerapps.io)
 
 It combines nutrition tracking, hydration, goals, shopping flow, pathway-based dashboards, and AI-assisted coaching in a single app.
 
