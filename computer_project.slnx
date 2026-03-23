@@ -1,6 +1,12 @@
 <Solution>
+  <Folder Name="/Local Founday/">
+    <File Path="AI service.txt" />
+  </Folder>
   <Project Path="computer_project.ApiService/computer_project.ApiService.csproj" />
   <Project Path="computer_project.AppHost/computer_project.AppHost.csproj" />
   <Project Path="computer_project.ServiceDefaults/computer_project.ServiceDefaults.csproj" />
   <Project Path="computer_project.Web/computer_project.Web.csproj" />
+  <Project Path="SmartBit.Setup/SmartBit.Setup.wixproj" Type="b7dd6f7e-def8-4e67-b5b7-07ef123db6f0">
+    <Platform Project="x64" />
+  </Project>
 </Solution>
