@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="@Assets["lib/bootstrap/dist/css/bootstrap.min.css"]" />
     <link rel="stylesheet" href="@Assets["app.css"]" />
     <link rel="stylesheet" href="@Assets["computer_project.Web.styles.css"]" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" />
     <ImportMap />
     <link rel="icon" type="image/png" href="favicon.png" />
     <HeadOutlet />
@@ -16,7 +17,32 @@
 <body>
     <Routes />
     <script src="@Assets["_framework/blazor.web.js"]"></script>
+    <script src="https://unpkg.com/@@zxing/library@latest/umd/index.min.js"></script>
     <script>
+        let codeReader;
+        window.startBarcodeScanner = async (videoElementId, dotnetHelper) => {
+            codeReader = new ZXing.BrowserMultiFormatReader();
+            try {
+                const videoInputDevices = await codeReader.listVideoInputDevices();
+                if (videoInputDevices.length > 0) {
+                    const firstDeviceId = videoInputDevices[0].deviceId;
+                    codeReader.decodeFromVideoDevice(firstDeviceId, videoElementId, (result, err) => {
+                        if (result) {
+                            dotnetHelper.invokeMethodAsync('OnBarcodeScanned', result.text);
+                            window.stopBarcodeScanner();
+                        }
+                    });
+                }
+            } catch (err) {
+                console.error(err);
+            }
+        };
+        window.stopBarcodeScanner = () => {
+            if (codeReader) {
+                codeReader.reset();
+            }
+        };
+
         window.setTheme = (theme) => {
             document.documentElement.setAttribute('data-bs-theme', theme);
         };
@@ -30,6 +56,20 @@
             a.click();
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
+        };
+        window.requestNotificationPermission = async () => {
+            if ("Notification" in window) {
+                return await Notification.requestPermission();
+            }
+            return "unsupported";
+        };
+        window.showNotification = (title, options) => {
+            if ("Notification" in window && Notification.permission === "granted") {
+                navigator.serviceWorker.getRegistration().then(reg => {
+                    if(reg) reg.showNotification(title, options);
+                    else new Notification(title, options);
+                }).catch(() => new Notification(title, options));
+            }
         };
     </script>
 </body>

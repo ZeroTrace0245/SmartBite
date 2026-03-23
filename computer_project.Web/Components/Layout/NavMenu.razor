@@ -1,4 +1,4 @@
-﻿@using computer_project.Web.Services
+@using computer_project.Web.Services
 @inject UserSession Session
 @inject NavigationManager Navigation
 
@@ -20,6 +20,79 @@
                     <span>Dashboard</span>
                 </NavLink>
             </div>
+
+            <div class="mt-4 px-3 mb-2 small text-white-50 text-uppercase fw-bold ls-wider opacity-50" style="font-size: 10px;">@Session.CurrentUser?.Pathway Navigation</div>
+
+            @if (Session.CurrentUser?.Pathway == "Gym")
+            {
+                <div class="nav-item">
+                    <NavLink class="nav-link acrylic-effect d-flex align-items-center gap-3" href="workouts">
+                        <i class="bi bi-activity text-danger fs-5"></i>
+                        <span>Workout Vol</span>
+                    </NavLink>
+                </div>
+                <div class="nav-item">
+                    <NavLink class="nav-link acrylic-effect d-flex align-items-center gap-3" href="calories">
+                        <i class="bi bi-fire text-danger fs-5"></i>
+                        <span>Calories Burned</span>
+                    </NavLink>
+                </div>
+                <div class="nav-item">
+                    <NavLink class="nav-link acrylic-effect d-flex align-items-center gap-3" href="supplements">
+                        <i class="bi bi-capsule text-danger fs-5"></i>
+                        <span>Supplements</span>
+                    </NavLink>
+                </div>
+                <div class="nav-item">
+                    <NavLink class="nav-link acrylic-effect d-flex align-items-center gap-3" href="recovery">
+                        <i class="bi bi-battery-charging text-danger fs-5"></i>
+                        <span>Recovery</span>
+                    </NavLink>
+                </div>
+            }
+            else if (Session.CurrentUser?.Pathway == "Diet")
+            {
+                <div class="nav-item">
+                    <NavLink class="nav-link acrylic-effect d-flex align-items-center gap-3" href="calorie-intake">
+                        <i class="bi bi-apple text-success fs-5"></i>
+                        <span>Calorie Intake</span>
+                    </NavLink>
+                </div>
+                <div class="nav-item">
+                    <NavLink class="nav-link acrylic-effect d-flex align-items-center gap-3" href="protein">
+                        <i class="bi bi-egg-fried text-success fs-5"></i>
+                        <span>Protein Tracking</span>
+                    </NavLink>
+                </div>
+                <div class="nav-item">
+                    <NavLink class="nav-link acrylic-effect d-flex align-items-center gap-3" href="weight">
+                        <i class="bi bi-speedometer text-success fs-5"></i>
+                        <span>Weight Analytics</span>
+                    </NavLink>
+                </div>
+                <div class="nav-item">
+                    <NavLink class="nav-link acrylic-effect d-flex align-items-center gap-3" href="nutrient-score">
+                        <i class="bi bi-clipboard2-pulse text-success fs-5"></i>
+                        <span>Nutrient Score</span>
+                    </NavLink>
+                </div>
+            }
+            else
+            {
+            }
+
+            <div class="mt-4 px-3 mb-2 small text-white-50 text-uppercase fw-bold ls-wider opacity-50" style="font-size: 10px;">Quick Access Actions</div>
+            @if(Session.CurrentUser?.Pathway == "Gym")
+            {
+                <div class="nav-item"><NavLink class="nav-link acrylic-effect d-flex align-items-center gap-3 text-white" href="workouts"><i class="bi bi-fire text-danger fs-5"></i><span>Log Workout</span></NavLink></div>
+                <div class="nav-item"><NavLink class="nav-link acrylic-effect d-flex align-items-center gap-3 text-white" href="supplements"><i class="bi bi-capsule text-danger fs-5"></i><span>Supplements</span></NavLink></div>
+            }
+            else if(Session.CurrentUser?.Pathway == "Diet")
+            {
+                <div class="nav-item"><NavLink class="nav-link acrylic-effect d-flex align-items-center gap-3 text-white" href="meals"><i class="bi bi-journal-plus text-success fs-5"></i><span>Log Meal</span></NavLink></div>
+                <div class="nav-item"><NavLink class="nav-link acrylic-effect d-flex align-items-center gap-3 text-white" href="plans"><i class="bi bi-list-check text-success fs-5"></i><span>New Plan</span></NavLink></div>
+            }
+         
 
             <div class="mt-4 px-3 mb-2 small text-white-50 text-uppercase fw-bold ls-wider opacity-50" style="font-size: 10px;">General</div>
 
@@ -48,9 +121,8 @@
 
             <div class="nav-item">
                 <NavLink class="nav-link acrylic-effect d-flex align-items-center gap-3" href="ai">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a4 4 0 0 1 4 4v2a4 4 0 0 1-8 0V6a4 4 0 0 1 4-4z"/><path d="M16 14H8a4 4 0 0 0-4 4v2h16v-2a4 4 0 0 0-4-4z"/></svg>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-warning"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.27 1.27L3 12l5.8 1.9a2 2 0 0 1 1.27 1.27L12 21l1.9-5.8a2 2 0 0 1 1.27-1.27L21 12l-5.8-1.9a2 2 0 0 1-1.27-1.27L12 3Z"/></svg>
                     <span>AI Coach</span>
-                    <span class="badge bg-info text-dark ms-auto" style="font-size: 9px;">Local</span>
                 </NavLink>
             </div>
 
@@ -65,6 +137,20 @@
                 <NavLink class="nav-link acrylic-effect d-flex align-items-center gap-3" href="shoppinglist">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
                     <span>Groceries</span>
+                </NavLink>
+            </div>
+
+            <div class="nav-item">
+                <NavLink class="nav-link acrylic-effect d-flex align-items-center gap-3" href="sleep">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" class="text-primary" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2"/><path d="M5 3L2 6"/><path d="M19 3l3 3"/></svg>
+                    <span>Sleep Tracker</span>
+                </NavLink>
+            </div>
+
+            <div class="nav-item">
+                <NavLink class="nav-link acrylic-effect d-flex align-items-center gap-3" href="steps">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" class="text-primary" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m13 14 1 7"/><path d="M14 14v-4l-4-4"/><path d="M10 10l-4 4"/><path d="m16 8-4-2"/><circle cx="15" cy="4" r="1"/></svg>
+                    <span>Step Tracker</span>
                 </NavLink>
             </div>
 
@@ -93,8 +179,29 @@
 
             <div class="nav-item">
                 <NavLink class="nav-link acrylic-effect d-flex align-items-center gap-3" href="feedback">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-                    <span>Support</span>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" class="text-secondary" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                    <span>General Feedback</span>
+                </NavLink>
+            </div>
+
+            <div class="nav-item">
+                <NavLink class="nav-link acrylic-effect d-flex align-items-center gap-3" href="help-support">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" class="text-success" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                    <span>Help & Support</span>
+                </NavLink>
+            </div>
+
+            <div class="nav-item">
+                <NavLink class="nav-link acrylic-effect d-flex align-items-center gap-3" href="community">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" class="text-info" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                    <span>Community</span>
+                </NavLink>
+            </div>
+
+            <div class="nav-item">
+                <NavLink class="nav-link acrylic-effect d-flex align-items-center gap-3" href="policies">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" class="text-muted" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                    <span>Policies</span>
                 </NavLink>
             </div>
 

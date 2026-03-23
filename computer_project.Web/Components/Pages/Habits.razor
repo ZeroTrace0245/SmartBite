@@ -1,0 +1,61 @@
+@page "/habits"
+@using computer_project.Web.Services
+@inject UserSession Session
+@rendermode InteractiveServer
+
+<PageTitle>Mood & Habits - SmartBite</PageTitle>
+
+<div class="px-md-4 py-4">
+    <div class="d-flex justify-content-between align-items-end mb-4">
+        <div>
+            <div class="breadcrumb-small mb-1 text-uppercase ls-widest fw-bold opacity-75 text-primary">General Wellness</div>
+            <h1 class="display-6 fw-bold mb-0">Mood & Habits</h1>
+        </div>
+        <button class="btn btn-primary btn-sm shadow px-4 py-2 rounded-3"><i class="bi bi-emoji-smile me-2"></i>Log Emotion</button>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <div class="col-md-5">
+            <div class="card p-4 border-0 shadow-sm border-bottom border-primary border-3 h-100 text-center">
+                <div class="text-muted small fw-bold mb-4 text-uppercase ls-wide">Today's Reflection</div>
+                <div class="stat-card-icon bg-primary bg-opacity-10 text-primary rounded-circle mx-auto mb-3" style="width: 80px; height: 80px;">
+                    <i class="bi bi-emoji-sunglasses display-4"></i>
+                </div>
+                <h4 class="fw-bold text-dark">Feeling Great</h4>
+                <p class="small text-muted mb-0">You noted feeling energetic and well-rested this morning.</p>
+            </div>
+        </div>
+        <div class="col-md-7">
+            <div class="card p-4 border-0 shadow-sm h-100">
+                <div class="d-flex justify-content-between mb-4">
+                    <h6 class="fw-bold m-0 text-primary">Micro-Habits Formed</h6>
+                    <span class="badge bg-primary bg-opacity-10 text-primary">This Week</span>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center mb-3 p-3 bg-light rounded-3 border">
+                    <div class="d-flex align-items-center gap-3">
+                        <i class="bi bi-book text-primary fs-4"></i>
+                        <div class="fw-bold">Read for 15 minutes</div>
+                    </div>
+                    <span class="text-success fw-bold"><i class="bi bi-check-circle-fill me-1"></i> Done</span>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center mb-3 p-3 bg-light rounded-3 border">
+                    <div class="d-flex align-items-center gap-3">
+                        <i class="bi bi-sun text-primary fs-4"></i>
+                        <div class="fw-bold">20m Morning Sunlight</div>
+                    </div>
+                    <span class="text-success fw-bold"><i class="bi bi-check-circle-fill me-1"></i> Done</span>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center p-3 bg-light rounded-3 border opacity-50">
+                    <div class="d-flex align-items-center gap-3">
+                        <i class="bi bi-journal-text text-primary fs-4"></i>
+                        <div class="fw-bold">Evening Gratitude Journal</div>
+                    </div>
+                    <span class="text-muted fw-bold">Pending Night</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

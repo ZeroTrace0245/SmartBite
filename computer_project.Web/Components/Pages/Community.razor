@@ -1,0 +1,200 @@
+@page "/community"
+@using computer_project.Web.Models
+@rendermode InteractiveServer
+
+<PageTitle>Community - SmartBite</PageTitle>
+
+<div class="container py-5 anim-fade-in" style="max-width: 900px;">
+    <div class="d-flex justify-content-between align-items-center mb-5 border-bottom pb-4">
+        <div>
+            <h1 class="fw-bold mb-1" style="color: #24292f;">SmartBite Community</h1>
+            <p class="text-muted mb-0">Share recipes, progress, and connect with other users.</p>
+        </div>
+        <button class="btn btn-primary fw-bold px-4 rounded-pill shadow-sm d-flex align-items-center gap-2" @onclick="ToggleCreatePost">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            New Post
+        </button>
+    </div>
+
+    @* --- Create Post Form --- *@
+    @if (showCreatePost)
+    {
+        <div class="card shadow-sm border-0 mb-4 anim-fade-in" style="background-color: #fff; border: 1px solid #d0d7de !important;">
+            <div class="card-header bg-light border-bottom py-3">
+                <h6 class="fw-bold mb-0">Create a New Post</h6>
+            </div>
+            <div class="card-body p-4">
+                <div class="mb-3">
+                    <label class="form-label fw-bold small">Title</label>
+                    <input type="text" class="form-control" placeholder="What's on your mind?" @bind="newPostTitle" />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold small">Content</label>
+                    <textarea class="form-control" rows="4" placeholder="Share your recipe, question, or milestone..." @bind="newPostContent"></textarea>
+                </div>
+                <div class="d-flex justify-content-end gap-2">
+                    <button class="btn btn-light border fw-bold px-4" @onclick="ToggleCreatePost">Cancel</button>
+                    <button class="btn btn-primary fw-bold px-4" @onclick="SubmitPost" disabled="@(string.IsNullOrWhiteSpace(newPostTitle) || string.IsNullOrWhiteSpace(newPostContent))">Post</button>
+                </div>
+            </div>
+        </div>
+    }
+
+    @* --- Dynamic Custom Posts --- *@
+    @if (userPosts.Any())
+    {
+        <div class="list-group shadow-sm mb-4 anim-fade-in">
+            @foreach (var post in userPosts.OrderByDescending(p => p.CreatedAt))
+            {
+                <div class="list-group-item p-4 border-0 border-bottom">
+                    <div class="d-flex gap-3">
+                        <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center fw-bold flex-shrink-0" style="width: 40px; height: 40px;">
+                            U
+                        </div>
+                        <div class="w-100">
+                            <div class="d-flex justify-content-between align-items-start mb-1">
+                                <h6 class="fw-bold mb-0">@post.Title</h6>
+                                <small class="text-muted">Just now</small>
+                            </div>
+                            <p class="text-secondary small mb-2" style="white-space: pre-wrap;">@post.Content</p>
+                            <div class="d-flex gap-3 text-muted" style="font-size: 0.8rem;">
+                                <span class="cursor-pointer hover-text-primary" @onclick="post.ToggleLike">
+                                    <i class="bi @(post.IsLiked ? "bi-heart-fill text-danger" : "bi-heart")"></i> @post.Likes
+                                </span>
+                                <span><i class="bi bi-chat"></i> 0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+
+    <!-- Featured Post -->
+    <div class="card shadow-sm border-0 mb-4" style="background-color: #f6f8fa;">
+        <div class="card-body p-4 position-relative">
+            <span class="badge bg-success position-absolute top-0 end-0 m-3">Featured Recipe</span>
+            <div class="d-flex gap-3 align-items-center mb-3">
+                <div class="bg-dark text-white rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width: 48px; height: 48px;">
+                    J
+                </div>
+                <div>
+                    <h5 class="fw-bold mb-0">Keto-Friendly Avocado Toast</h5>
+                    <small class="text-muted">Posted by <strong>JaneDoe</strong> • 2 hours ago</small>
+                </div>
+            </div>
+            <p class="text-dark mb-3">I just tried the AI Coach's recommendation for a low-carb breakfast and it was amazing! Swapped regular bread for keto bread and loaded it with chia seeds and chili flakes. Only 350 calories.</p>
+            <div class="d-flex gap-4 text-muted small">
+                <span class="cursor-pointer hover-text-primary"><i class="bi bi-heart me-1"></i> 124 Likes</span>
+                <span class="cursor-pointer hover-text-primary"><i class="bi bi-chat me-1"></i> 24 Comments</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Regular Posts List -->
+    <div class="list-group shadow-sm">
+        <div class="list-group-item p-4 border-0 border-bottom">
+            <div class="d-flex gap-3">
+                <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center fw-bold flex-shrink-0" style="width: 40px; height: 40px;">
+                    M
+                </div>
+                <div class="w-100">
+                    <div class="d-flex justify-content-between align-items-start mb-1">
+                        <h6 class="fw-bold mb-0">Hit my hydration goal 7 days in a row! 💧</h6>
+                        <small class="text-muted">5 hours ago</small>
+                    </div>
+                    <p class="text-secondary small mb-2">Thanks to the daily reminders on the dash, I finally stopped slacking on my water intake.</p>
+                    <div class="d-flex gap-3 text-muted" style="font-size: 0.8rem;">
+                        <span><i class="bi bi-heart"></i> 56</span>
+                        <span><i class="bi bi-chat"></i> 8</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="list-group-item p-4 border-0 border-bottom">
+            <div class="d-flex gap-3">
+                <div class="bg-secondary text-white rounded-circle d-flex align-items-center justify-content-center fw-bold flex-shrink-0" style="width: 40px; height: 40px;">
+                    A
+                </div>
+                <div class="w-100">
+                    <div class="d-flex justify-content-between align-items-start mb-1">
+                        <h6 class="fw-bold mb-0">Help with intermittent fasting?</h6>
+                        <small class="text-muted">1 day ago</small>
+                    </div>
+                    <p class="text-secondary small mb-2">I am doing 16:8 but struggling around hour 14. What are your tips for getting through the last push without breaking fast?</p>
+                    <div class="d-flex gap-3 text-muted" style="font-size: 0.8rem;">
+                        <span><i class="bi bi-heart"></i> 89</span>
+                        <span><i class="bi bi-chat"></i> 42</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .cursor-pointer { cursor: pointer; }
+    .hover-text-primary:hover { color: #0d6efd !important; }
+    .anim-fade-in {
+        animation: fadeIn 0.5s ease-in-out;
+    }
+    @@keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
+
+@code {
+    private bool showCreatePost = false;
+    private string newPostTitle = "";
+    private string newPostContent = "";
+    private List<CommunityPost> userPosts = new();
+
+    private void ToggleCreatePost()
+    {
+        showCreatePost = !showCreatePost;
+        if (!showCreatePost)
+        {
+            newPostTitle = "";
+            newPostContent = "";
+        }
+    }
+
+    private void SubmitPost()
+    {
+        if (string.IsNullOrWhiteSpace(newPostTitle) || string.IsNullOrWhiteSpace(newPostContent)) return;
+
+        userPosts.Add(new CommunityPost
+        {
+            Title = newPostTitle,
+            Content = newPostContent,
+            CreatedAt = DateTime.Now
+        });
+
+        ToggleCreatePost();
+    }
+
+    private class CommunityPost
+    {
+        public string Title { get; set; } = "";
+        public string Content { get; set; } = "";
+        public DateTime CreatedAt { get; set; }
+        public int Likes { get; set; } = 0;
+        public bool IsLiked { get; set; } = false;
+
+        public void ToggleLike()
+        {
+            if (IsLiked)
+            {
+                Likes--;
+                IsLiked = false;
+            }
+            else
+            {
+                Likes++;
+                IsLiked = true;
+            }
+        }
+    }
+}

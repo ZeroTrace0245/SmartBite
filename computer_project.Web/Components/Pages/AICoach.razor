@@ -8,106 +8,109 @@
 <PageTitle>AI Coach - SmartBite</PageTitle>
 
 <ConsumerOnly>
-    <div class="container py-4">
-        <div class="d-flex align-items-center gap-3 mb-4">
-            <div class="bg-primary bg-opacity-25 text-primary rounded-circle d-flex align-items-center justify-content-center" style="width:48px; height:48px;">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a4 4 0 0 1 4 4v2a4 4 0 0 1-8 0V6a4 4 0 0 1 4-4z"/><path d="M16 14H8a4 4 0 0 0-4 4v2h16v-2a4 4 0 0 0-4-4z"/><circle cx="12" cy="6" r="1"/></svg>
-            </div>
-            <div>
-                <h1 class="display-6 fw-bold mb-0">AI Health Coach</h1>
-                <div class="text-muted small">Powered by AI Foundry Local — runs entirely on your machine</div>
-            </div>
-        </div>
+    <style>
+        .chat-anim {
+            animation: slideUpFade 0.4s ease-out forwards;
+        }
+        @@keyframes slideUpFade {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .coach-icon-bg {
+            background: linear-gradient(135deg, #6f42c1, #007bff);
+        }
+    </style>
+    <div class="container py-4 d-flex flex-column" style="max-width: 800px; min-height: 80vh;">
+        @if (!chatMessages.Any())
+        {
+            <div class="d-flex flex-column align-items-center justify-content-center flex-grow-1 chat-anim mb-5 mt-5">
+                <div class="mb-3">
+                    <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="text-primary" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                </div>
+                <h1 class="h3 fw-bold mb-2" style="color: #24292f;">SmartBite AI Coach</h1>
+                <p class="text-muted mb-4">Powered by <strong>GitHub Models</strong> (Aspire + MEAI)</p>
 
-        @* --- Warning Banner (always visible) --- *@
-        <div class="alert border-0 shadow-sm mb-4" style="background: rgba(255, 193, 7, 0.15); border-left: 4px solid #ffc107 !important;">
-            <div class="d-flex align-items-start gap-3">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffc107" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="flex-shrink-0 mt-1"><path d="M10.29 3.86 1.82 18a1 1 0 0 0 .86 1.5h18.64a1 1 0 0 0 .86-1.5L13.71 3.86a1 1 0 0 0-1.72 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-                <div>
-                    <h6 class="fw-bold mb-1" style="color: #ffc107;">AI Foundry Local Required</h6>
-                    <p class="mb-2 small" style="color: rgba(255,255,255,0.8);">
-                        This feature uses <strong>AI Foundry Local</strong> to run AI models entirely on your device.
-                        <strong>No cloud services or API keys are needed</strong> — all processing stays on your machine.
-                    </p>
-                    <div class="small" style="color: rgba(255,255,255,0.7);">
-                        <strong>Setup steps:</strong>
-                        <ol class="mb-0 mt-1 ps-3">
-                            <li>Install <strong>AI Foundry Local</strong> from <a href="https://github.com/microsoft/ai-foundry-local" target="_blank" class="text-info">github.com/microsoft/ai-foundry-local</a></li>
-                            <li>Download a model: <code>foundry model download phi-3.5-mini</code></li>
-                            <li>Open a <strong>separate PowerShell window</strong> and run: <code>foundry model run phi-3.5-mini</code></li>
-                            <li>
-                                Note the IP and port from the output line:<br />
-                                <code class="text-info">Service is Started on http://127.0.0.1:XXXXX/</code>
-                            </li>
-                            <li>
-                                Open <code>computer_project.ApiService/appsettings.json</code> and make sure the <strong>Endpoint</strong> matches:<br />
-                                <code class="text-info">"Endpoint": "http://127.0.0.1:XXXXX"</code>
-                            </li>
-                            <li>Restart the solution after updating the endpoint</li>
-                        </ol>
+                <div class="w-100 mb-5" style="max-width: 600px;">
+                    <div class="d-flex gap-2 p-2 rounded shadow-sm" style="background-color: #fff; border: 1px solid #d0d7de;">
+                        <input class="form-control border-0 bg-transparent shadow-none" style="font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;" placeholder="Ask a health or nutrition question..." @bind="userPrompt" @onkeydown="HandleKeyDown" disabled="@isThinking" />
+                        <button class="btn btn-primary px-4 fw-bold" @onclick="SendMessage" disabled="@(isThinking || string.IsNullOrWhiteSpace(userPrompt))">
+                            Prompt
+                        </button>
                     </div>
-                    <div class="mt-2 small" style="color: rgba(255,255,255,0.6);">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-                        <strong>Important:</strong> The port changes every time Foundry starts. Always check the port and update <code>appsettings.json</code> if needed.
+                </div>
+
+                @* --- Quick Action Pathways --- *@
+                <div class="row g-3 w-100">
+                    <div class="col-md-4">
+                        <div class="card h-100 shadow-sm border-0" style="background-color: #f6f8fa; cursor: pointer; transition: transform 0.2s, background-color 0.2s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'" @onclick='() => SendQuickPrompt("Generate a 7-day meal plan tailored for my diet. Include daily macro targets (calories, protein, carbs, fat), exact portion sizes, and a summarized grocery list for the week.")'>
+                            <div class="card-body text-center p-3">
+                                <div class="mb-2 text-primary">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>
+                                </div>
+                                <h6 class="fw-bold mb-1 text-dark" style="font-size: 0.9rem;">Diet Plan</h6>
+                                <p class="text-muted small mb-0" style="font-size: 0.75rem;">Generate meal plans, macros & grocery lists.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card h-100 shadow-sm border-0" style="background-color: #f6f8fa; cursor: pointer; transition: transform 0.2s, background-color 0.2s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'" @onclick='() => SendQuickPrompt("Create a personalized workout routine. Include strength and endurance exercises, target calories to burn, recommended rest protocols, and tips for progressive overload.")'>
+                            <div class="card-body text-center p-3">
+                                <div class="mb-2 text-danger">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m18 11.23-.42.42a4.99 4.99 0 0 0-1.46 3.53C16.12 18 18.5 20.38 21 20.38a3.1 3.1 0 0 0 0-6.19c-.31 0-.62.04-.92.11L21 11.5a13.9 13.9 0 0 0-3-4.5"/><path d="m6 11.23.42.42a4.99 4.99 0 0 1 1.46 3.53C7.88 18 5.5 20.38 3 20.38a3.1 3.1 0 0 1 0-6.19A3.08 3.08 0 0 1 3.92 14.3L3 11.5a13.9 13.9 0 0 1 3-4.5"/><path d="M14.5 5.5a2.5 2.5 0 0 0-5 0v3.5a2.5 2.5 0 0 0 5 0z"/></svg>
+                                </div>
+                                <h6 class="fw-bold mb-1 text-dark" style="font-size: 0.9rem;">Gym Routine</h6>
+                                <p class="text-muted small mb-0" style="font-size: 0.75rem;">Get personalized workouts & performance tips.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card h-100 shadow-sm border-0" style="background-color: #f6f8fa; cursor: pointer; transition: transform 0.2s, background-color 0.2s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'" @onclick='() => SendQuickPrompt("Create a balanced holistic wellness plan for me. Include hydration targets, sleep hygiene tips, step goals, and balanced meal suggestions without strict diet rules.")'>
+                            <div class="card-body text-center p-3">
+                                <div class="mb-2 text-success">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                                </div>
+                                <h6 class="fw-bold mb-1 text-dark" style="font-size: 0.9rem;">General Wellness</h6>
+                                <p class="text-muted small mb-0" style="font-size: 0.75rem;">Build a simple daily routine & healthy habits.</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-
-        @* --- Connection Status --- *@
-        <div class="card border-0 shadow-sm mb-4 p-3">
-            <div class="d-flex align-items-center justify-content-between">
-                <div class="d-flex align-items-center gap-3">
-                    @if (isChecking)
-                    {
-                        <div class="spinner-border spinner-border-sm text-secondary" role="status"></div>
-                        <span class="small">Checking AI Foundry Local connection...</span>
-                    }
-                    else if (isAIOnline)
-                    {
-                        <span class="badge rounded-pill bg-success px-3 py-2">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="me-1"><polyline points="20 6 9 17 4 12"/></svg>
-                            Connected
-                        </span>
-                        <span class="small text-muted">AI Foundry Local is running — model: <strong>phi-3.5-mini</strong></span>
-                    }
-                    else
-                    {
-                        <span class="badge rounded-pill bg-danger px-3 py-2">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="me-1"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-                            Offline
-                        </span>
-                        <span class="small text-muted">AI Foundry Local is not running. Start it with <code>foundry service start</code></span>
-                    }
-                </div>
-                <button class="btn btn-sm btn-outline-light" @onclick="CheckAIStatus" disabled="@isChecking">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
-                </button>
-            </div>
-        </div>
-
-        @if (isAIOnline)
+        }
+        else
         {
             @* --- Chat Interface --- *@
-            <div class="card border-0 shadow-sm">
-                <div class="card-body p-4">
-                    <h5 class="fw-bold mb-3">Ask your AI Coach</h5>
-                    <p class="text-muted small mb-4">Ask about nutrition, meal suggestions, calorie estimates, or health tips. Everything runs locally on your device.</p>
-
-                    <div class="chat-messages mb-4" style="max-height: 400px; overflow-y: auto;">
+            <div class="card shadow-sm chat-anim flex-grow-1 d-flex flex-column" style="border-color: #d0d7de !important; background-color: #f6f8fa;">
+                <div class="card-header bg-white border-bottom py-3 d-flex align-items-center justify-content-between" style="border-color: #d0d7de !important;">
+                    <h6 class="fw-bold mb-0 d-flex align-items-center" style="color: #24292f;">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="text-primary me-2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                        SmartBite AI Coach
+                    </h6>
+                    <span class="badge bg-light text-dark border">GitHub Models</span>
+                </div>
+                <div class="card-body p-4 bg-white d-flex flex-column" style="border-bottom-left-radius: var(--bs-card-border-radius); border-bottom-right-radius: var(--bs-card-border-radius); flex: 1 1 auto; overflow: hidden;">
+                    <div class="chat-messages mb-4 flex-grow-1" style="overflow-y: auto;">
                         @foreach (var msg in chatMessages)
                         {
-                            <div class="d-flex gap-3 mb-3 @(msg.IsUser ? "justify-content-end" : "")">
+                            <div class="d-flex gap-3 mb-3 chat-anim @(msg.IsUser ? "justify-content-end" : "")">
                                 @if (!msg.IsUser)
                                 {
-                                    <div class="bg-primary bg-opacity-25 text-primary rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width:32px; height:32px; font-size:14px;">AI</div>
+                                    <div class="coach-icon-bg text-white rounded flex-shrink-0 d-flex align-items-center justify-content-center shadow-sm" style="width:32px; height:32px; font-size:14px;">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a4 4 0 0 1 4 4v2a4 4 0 0 1-8 0V6a4 4 0 0 1 4-4z"/></svg>
+                                    </div>
                                 }
-                                <div class="p-3 rounded-4 @(msg.IsUser ? "bg-primary text-white" : "card border-0")" style="max-width: 75%;">
-                                    <div class="small" style="white-space: pre-wrap;">@msg.Text</div>
+                                <div class="p-3 @(msg.IsUser ? "bg-light border text-dark text-end" : "text-dark")" style="max-width: 80%; border-radius: 6px; @(msg.IsUser ? "border-color: #d0d7de !important; background-color: #f6f8fa !important;" : "")">
+                                    <div class="small" style="line-height: 1.5; font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;">
+                                        @if(msg.IsUser) {
+                                            <div style="white-space: pre-wrap;">@msg.Text</div>
+                                        } else {
+                                            @((MarkupString)Markdig.Markdown.ToHtml(msg.Text))
+                                        }
+                                    </div>
                                 </div>
                                 @if (msg.IsUser)
                                 {
-                                    <div class="bg-secondary bg-opacity-25 text-secondary rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width:32px; height:32px; font-size:14px;">
+                                    <div class="bg-secondary text-white rounded flex-shrink-0 d-flex align-items-center justify-content-center" style="width:32px; height:32px; font-size:14px;">
                                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
                                     </div>
                                 }
@@ -116,22 +119,23 @@
 
                         @if (isThinking)
                         {
-                            <div class="d-flex gap-3 mb-3">
-                                <div class="bg-primary bg-opacity-25 text-primary rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width:32px; height:32px; font-size:14px;">AI</div>
-                                <div class="p-3 rounded-4 card border-0">
-                                    <div class="small text-muted">
-                                        <div class="spinner-border spinner-border-sm me-2" role="status"></div>
-                                        Thinking...
+                            <div class="d-flex gap-3 mb-3 chat-anim">
+                                <div class="coach-icon-bg text-white rounded flex-shrink-0 d-flex align-items-center justify-content-center shadow-sm" style="width:32px; height:32px; font-size:14px;">
+                                    <div class="spinner-border spinner-border-sm" role="status" style="width:12px; height:12px; border-width: 1px;"></div>
+                                </div>
+                                <div class="p-3 text-muted">
+                                    <div class="small" style="font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;">
+                                        Fetching advice from GitHub Models...
                                     </div>
                                 </div>
                             </div>
                         }
                     </div>
 
-                    <div class="d-flex gap-2">
-                        <input class="form-control" placeholder="e.g. Suggest a high-protein breakfast under 400 calories" @bind="userPrompt" @onkeydown="HandleKeyDown" disabled="@isThinking" />
-                        <button class="btn btn-primary px-4" @onclick="SendMessage" disabled="@(isThinking || string.IsNullOrWhiteSpace(userPrompt))">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                    <div class="d-flex gap-2 p-2 rounded chat-anim" style="background-color: #f6f8fa; border: 1px solid #d0d7de;">
+                        <input class="form-control border-0 bg-transparent shadow-none" style="font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;" placeholder="Ask a health or nutrition question..." @bind="userPrompt" @onkeydown="HandleKeyDown" disabled="@isThinking" />
+                        <button class="btn btn-primary px-4 fw-bold" @onclick="SendMessage" disabled="@(isThinking || string.IsNullOrWhiteSpace(userPrompt))">
+                            Prompt
                         </button>
                     </div>
                 </div>
@@ -141,25 +145,9 @@
 </ConsumerOnly>
 
 @code {
-    private bool isChecking = true;
-    private bool isAIOnline = false;
     private bool isThinking = false;
     private string userPrompt = "";
     private List<ChatMessage> chatMessages = new();
-
-    protected override async Task OnInitializedAsync()
-    {
-        await CheckAIStatus();
-    }
-
-    private async Task CheckAIStatus()
-    {
-        isChecking = true;
-        StateHasChanged();
-        isAIOnline = await ApiClient.IsAIOnlineAsync();
-        isChecking = false;
-        StateHasChanged();
-    }
 
     private async Task HandleKeyDown(Microsoft.AspNetCore.Components.Web.KeyboardEventArgs e)
     {
@@ -184,13 +172,19 @@
             var response = await ApiClient.GetAICoachAdviceAsync(question);
             chatMessages.Add(new ChatMessage(response, false));
         }
-        catch
+        catch (Exception ex)
         {
-            chatMessages.Add(new ChatMessage("Could not reach AI. Make sure AI Foundry Local is running.", false));
+            chatMessages.Add(new ChatMessage($"Could not reach AI. Error: {ex.Message}", false));
         }
 
         isThinking = false;
         StateHasChanged();
+    }
+
+    private async Task SendQuickPrompt(string prompt)
+    {
+        userPrompt = prompt;
+        await SendMessage();
     }
 
     private record ChatMessage(string Text, bool IsUser);
