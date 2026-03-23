@@ -1,7 +1,11 @@
 @page "/reports"
 @using computer_project.Web.Models
+@using OpenAI.Chat
+@using Microsoft.Extensions.DependencyInjection
+@using System.Text.Json
 @inject SmartBiteApiClient ApiClient
 @inject IJSRuntime JS
+@inject IServiceProvider Provider
 @rendermode InteractiveServer
 
 <PageTitle>Health Reports</PageTitle>
@@ -61,13 +65,29 @@
                             </div>
                         </div>
                         <div class="mt-4">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h6 class="fw-bold mb-0 text-primary">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="me-1"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+                                    AI Health Insights
+                                </h6>
+                                <button class="btn btn-sm btn-outline-primary" @onclick="GenerateAiTips" disabled="@isLoadingAi">
+                                    @if (isLoadingAi) { <span class="spinner-border spinner-border-sm me-2"></span> }
+                                    Analyze My Data
+                                </button>
+                            </div>
                             <div class="row g-3">
+                                @if (tips.Count == 0 && !isLoadingAi)
+                                {
+                                    <div class="col-12 text-center text-muted small py-3">
+                                        Click "Analyze My Data" to generate personalized feedback based on your recent meals.
+                                    </div>
+                                }
                                 @foreach (var tip in tips)
                                 {
                                     <div class="col-md-4">
                                         <div class="p-3 h-100 bg-primary bg-opacity-10 border border-primary border-opacity-10 rounded-3">
                                             <div class="d-flex gap-2">
-                                                <i class="bi bi-lightbulb-fill text-primary"></i>
+                                                <i class="bi bi-lightbulb-fill text-primary mt-1"></i>
                                                 <p class="mb-0 small fw-semibold">@tip</p>
                                             </div>
                                         </div>
@@ -122,17 +142,90 @@
 @code {
     private HealthReport? report;
     private List<Meal>? meals;
-    private readonly string[] tips = new[]
+    private List<string> tips = new();
+    private bool isLoadingAi = false;
+
+    private class AiTipsData
     {
-        "Front load protein at breakfast to stay full longer.",
-        "Sip water steadily aim for 250ml every hour you’re awake.",
-        "Batch prep a veggie lean protein combo twice a week."
-    };
+        public List<string> Suggestions { get; set; } = new();
+    }
 
     protected override async Task OnInitializedAsync()
     {
         report = await ApiClient.GetReportAsync();
         meals = await ApiClient.GetMealsAsync();
+    }
+
+    private async Task GenerateAiTips()
+    {
+        if (report == null || meals == null) return;
+
+        var chatClient = Provider.GetService<ChatClient>();
+        if (chatClient == null)
+        {
+            await JS.InvokeVoidAsync("alert", "AI ChatClient not configured. Please add GitHubToken to user secrets.");
+            return;
+        }
+
+        isLoadingAi = true;
+        try
+        {
+            var mealSummaries = string.Join("\n", meals.Take(10).Select(m => $"- {m.Name}: {m.Calories} kcal (P: {m.Protein}g, C: {m.Carbs}g, F: {m.Fat}g)"));
+
+            var prompt = $$"""
+                You are an expert fitness and nutrition coach. Here is the user's daily summary:
+                Calories: {{report.TotalCalories}}
+                Protein: {{report.Protein}}g
+                Carbs: {{report.Carbs}}g
+                Fat: {{report.Fat}}g
+
+                And their recent meals:
+                {{mealSummaries}}
+
+                Provide exactly 3 concise, actionable, and personalized suggestions to improve their diet, hit their goals, or recover better.
+                Respond ONLY with a valid JSON object matching this schema. Do not include markdown codeblocks or any backticks:
+                {
+                  "Suggestions": [
+                    "Short tip 1...",
+                    "Short tip 2...",
+                    "Short tip 3..."
+                  ]
+                }
+                """;
+
+            var response = await chatClient.CompleteChatAsync(prompt);
+            var jsonString = response.Value.Content[0].Text?.Trim();
+
+            if (!string.IsNullOrEmpty(jsonString))
+            {
+                if (jsonString.StartsWith("```json"))
+                {
+                    jsonString = jsonString.Substring(7);
+                    if (jsonString.EndsWith("```")) jsonString = jsonString.Substring(0, jsonString.Length - 3);
+                }
+                else if (jsonString.StartsWith("```"))
+                {
+                    jsonString = jsonString.Substring(3);
+                    if (jsonString.EndsWith("```")) jsonString = jsonString.Substring(0, jsonString.Length - 3);
+                }
+
+                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                var data = JsonSerializer.Deserialize<AiTipsData>(jsonString.Trim(), options);
+
+                if (data != null && data.Suggestions != null)
+                {
+                    tips = data.Suggestions;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            await JS.InvokeVoidAsync("alert", $"Failed to generate insights: {ex.Message}");
+        }
+        finally
+        {
+            isLoadingAi = false;
+        }
     }
 
     private async Task ExtractCSV()

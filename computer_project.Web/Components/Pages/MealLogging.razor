@@ -1,9 +1,13 @@
 @page "/meals"
 @using computer_project.Web.Models
 @using computer_project.Web.Services
+@using OpenAI.Chat
+@using Microsoft.Extensions.DependencyInjection
+@using System.Text.Json
 @inject SmartBiteApiClient ApiClient
 @inject UserSession Session
 @inject IJSRuntime JS
+@inject IServiceProvider Provider
 @rendermode InteractiveServer
 @implements IDisposable
 
@@ -24,27 +28,115 @@
     <div class="card mb-4">
         <div class="card-body p-4">
             <h5 class="mb-3">Log New Meal</h5>
+
+            <!-- Quick Add / Favorites -->
+            <div class="row g-3 mb-4 pb-4 border-bottom">
+                <div class="col-md-12 d-flex gap-2">
+                    <button class="btn btn-outline-success" @onclick="LogYesterdayMeals">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="me-1"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg>
+                        Copy Yesterday's Meals
+                    </button>
+                    <div class="dropdown">
+                        <button class="btn btn-outline-info dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="me-1"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+                            Favorite Meals
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><button class="dropdown-item" @onclick="@(() => LogFavorite("Standard Morning Shake"))">Standard Morning Shake</button></li>
+                            <li><button class="dropdown-item" @onclick="@(() => LogFavorite("Chicken Rice Bowl"))">Chicken Rice Bowl</button></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-3 mb-4 pb-4 border-bottom">
+                <div class="col-md-9">
+                    <label class="form-label small fw-bold text-primary">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="me-1"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+                        Auto-Log with AI
+                    </label>
+                    <input class="form-control" @bind="nlpInput" placeholder="e.g. I had 2 scrambled eggs and black coffee for breakfast" />
+                </div>
+                <div class="col-md-3 d-flex gap-2 align-items-end">
+                    <button class="btn btn-outline-primary flex-grow-1" @onclick="ParseMeal" disabled="@isParsing">
+                        @if (isParsing) { <span class="spinner-border spinner-border-sm me-2"></span> }
+                        Extract Macros
+                    </button>
+                    <button class="btn btn-outline-secondary px-3" @onclick="ToggleBarcodeScanner" title="Scan Barcode">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><rect x="7" y="7" width="10" height="10" rx="1"/></svg>
+                    </button>
+                </div>
+            </div>
+
+            @if (isScanningBarcode)
+            {
+                <div class="mb-4 text-center">
+                    <video id="videoElement" style="width: 100%; max-width: 400px; border: 1px solid #ccc; border-radius: 8px;"></video>
+                    <p class="text-muted mt-2 small">Scanning for barcode...</p>
+                    <button class="btn btn-sm btn-danger mt-2" @onclick="ToggleBarcodeScanner">Cancel Scan</button>
+                </div>
+            }
+
             <div class="row g-3">
-                <div class="col-md-4">
-                    <label class="form-label small fw-bold">Meal Name</label>
-                    <input class="form-control" @bind="newMealName" placeholder="e.g. Chicken Salad" />
+
+                <div class="col-md-3">
+                    <label class="form-label small fw-bold">Search Database</label>
+                    <select class="form-select" @bind="SelectedFoodName" @bind:after="OnFoodSelectionChanged">
+                        <option value="">-- Custom Entry --</option>
+                        @foreach (var f in foodDatabase)
+                        {
+                            <option value="@f.Name">@f.Name</option>
+                        }
+                    </select>
                 </div>
-                <div class="col-md-2">
-                    <label class="form-label small fw-bold">Calories</label>
-                    <input type="number" class="form-control" @bind="newMealCalories" />
-                </div>
-                <div class="col-md-2">
-                    <label class="form-label small fw-bold">Protein (g)</label>
-                    <input type="number" class="form-control" @bind="newProtein" />
-                </div>
-                <div class="col-md-2">
-                    <label class="form-label small fw-bold">Carbs (g)</label>
-                    <input type="number" class="form-control" @bind="newCarbs" />
-                </div>
-                <div class="col-md-2">
-                    <label class="form-label small fw-bold">Fat (g)</label>
-                    <input type="number" class="form-control" @bind="newFat" />
-                </div>
+
+                @if (CurrentFood != null)
+                {
+                    <div class="col-md-2">
+                        <label class="form-label small fw-bold">Measure</label>
+                        <select class="form-select" @bind="SelectedMeasure">
+                            @foreach (var m in CurrentFood.MeasureWeights.Keys)
+                            {
+                                <option value="@m">@m</option>
+                            }
+                            <option value="100g">100g</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label small fw-bold">Portion: @Portion</label>
+                        <input type="range" class="form-range" min="0.1" max="10" step="0.1" @bind="Portion" @bind:event="oninput" />
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label small fw-bold">Nutrition</label>
+                        <div class="p-2 bg-light border rounded small d-flex justify-content-between align-items-center" style="height: 38px;">
+                            <span class="fw-bold">@CalculatedCalories kcal</span>
+                            <span class="text-muted">P: @CalculatedProtein C: @CalculatedCarbs F: @CalculatedFat</span>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div class="col-md-3">
+                        <label class="form-label small fw-bold">Meal Name</label>
+                        <input class="form-control" @bind="newMealName" placeholder="e.g. Chicken Salad" />
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label small fw-bold">Calories</label>
+                        <input type="number" class="form-control" @bind="newMealCalories" />
+                    </div>
+                    <div class="col-md-1">
+                        <label class="form-label small fw-bold">Pro(g)</label>
+                        <input type="number" class="form-control" @bind="newProtein" />
+                    </div>
+                    <div class="col-md-1">
+                        <label class="form-label small fw-bold">Car(g)</label>
+                        <input type="number" class="form-control" @bind="newCarbs" />
+                    </div>
+                    <div class="col-md-1">
+                        <label class="form-label small fw-bold">Fat(g)</label>
+                        <input type="number" class="form-control" @bind="newFat" />
+                    </div>
+                }
                 <div class="col-12 text-end mt-4">
                     <button class="btn btn-primary px-4" @onclick="AddMeal">Log Meal</button>
                 </div>
@@ -96,12 +188,238 @@
 </ConsumerOnly>
 
 @code {
+    public class FoodItemData
+    {
+        public string Name { get; set; } = "";
+        public double CaloriesPer100g { get; set; }
+        public double ProteinPer100g { get; set; }
+        public double CarbsPer100g { get; set; }
+        public double FatPer100g { get; set; }
+        public Dictionary<string, double> MeasureWeights { get; set; } = new();
+    }
+
+    private List<FoodItemData> foodDatabase = new()
+    {
+        new FoodItemData { Name = "Rice (Cooked)", CaloriesPer100g = 130, ProteinPer100g = 2.7, CarbsPer100g = 28, FatPer100g = 0.3, MeasureWeights = new() { { "Cup", 158 }, { "Tablespoon", 10 } } },
+        new FoodItemData { Name = "Chicken Breast", CaloriesPer100g = 165, ProteinPer100g = 31, CarbsPer100g = 0, FatPer100g = 3.6, MeasureWeights = new() { { "Piece", 120 }, { "Cup", 140 } } },
+        new FoodItemData { Name = "Apple", CaloriesPer100g = 52, ProteinPer100g = 0.3, CarbsPer100g = 14, FatPer100g = 0.2, MeasureWeights = new() { { "Piece (Medium)", 182 }, { "Slice", 15 } } },
+        new FoodItemData { Name = "Bread (White)", CaloriesPer100g = 265, ProteinPer100g = 9, CarbsPer100g = 49, FatPer100g = 3.2, MeasureWeights = new() { { "Slice", 25 } } },
+        new FoodItemData { Name = "Olive Oil", CaloriesPer100g = 884, ProteinPer100g = 0, CarbsPer100g = 0, FatPer100g = 100, MeasureWeights = new() { { "Tablespoon", 13.5 }, { "Teaspoon", 4.5 } } }
+    };
+
+    private string SelectedFoodName { get; set; } = "";
+    private string SelectedMeasure { get; set; } = "100g";
+    private double Portion { get; set; } = 1.0;
+
+    private void OnFoodSelectionChanged()
+    {
+        if (CurrentFood != null && CurrentFood.MeasureWeights.Any())
+        {
+            SelectedMeasure = CurrentFood.MeasureWeights.First().Key;
+        }
+        else
+        {
+            SelectedMeasure = "100g";
+        }
+        Portion = 1.0;
+    }
+
+    private FoodItemData? CurrentFood => foodDatabase.FirstOrDefault(f => f.Name == SelectedFoodName);
+
+    private double CalculatedWeightGrams
+    {
+        get
+        {
+            if (CurrentFood == null) return 0;
+            double baseW = 100;
+            if (CurrentFood.MeasureWeights.TryGetValue(SelectedMeasure, out var w)) baseW = w;
+            return baseW * Portion;
+        }
+    }
+
+    private int CalculatedCalories => (int)Math.Round((CurrentFood?.CaloriesPer100g ?? 0) * CalculatedWeightGrams / 100.0);
+    private int CalculatedProtein => (int)Math.Round((CurrentFood?.ProteinPer100g ?? 0) * CalculatedWeightGrams / 100.0);
+    private int CalculatedCarbs => (int)Math.Round((CurrentFood?.CarbsPer100g ?? 0) * CalculatedWeightGrams / 100.0);
+    private int CalculatedFat => (int)Math.Round((CurrentFood?.FatPer100g ?? 0) * CalculatedWeightGrams / 100.0);
+
     private List<Meal>? meals;
     private string newMealName = "";
     private double newMealCalories;
     private double newProtein;
     private double newCarbs;
     private double newFat;
+
+    private string nlpInput = "";
+    private bool isParsing = false;
+    private bool isScanningBarcode = false;
+    private DotNetObjectReference<MealLogging>? objRef;
+
+    private async Task ToggleBarcodeScanner()
+    {
+        isScanningBarcode = !isScanningBarcode;
+        if (isScanningBarcode)
+        {
+            objRef = DotNetObjectReference.Create(this);
+            await JS.InvokeVoidAsync("startBarcodeScanner", "videoElement", objRef);
+        }
+        else
+        {
+            await JS.InvokeVoidAsync("stopBarcodeScanner");
+            if (objRef != null)
+            {
+                objRef.Dispose();
+                objRef = null;
+            }
+        }
+    }
+
+    [JSInvokable]
+    public async Task OnBarcodeScanned(string barcode)
+    {
+        isScanningBarcode = false;
+        await InvokeAsync(StateHasChanged);
+
+        try
+        {
+            using var http = new HttpClient();
+            var res = await http.GetFromJsonAsync<JsonElement>($"https://world.openfoodfacts.org/api/v0/product/{barcode}.json");
+            if (res.GetProperty("status").GetInt32() == 1)
+            {
+                var product = res.GetProperty("product");
+                var nutriments = product.GetProperty("nutriments");
+
+                newMealName = product.GetProperty("product_name").GetString() ?? "Unknown Product";
+                newMealCalories = nutriments.TryGetProperty("energy-kcal_100g", out var k) ? k.GetDouble() : 0;
+                newProtein = nutriments.TryGetProperty("proteins_100g", out var p) ? p.GetDouble() : 0;
+                newCarbs = nutriments.TryGetProperty("carbohydrates_100g", out var c) ? c.GetDouble() : 0;
+                newFat = nutriments.TryGetProperty("fat_100g", out var f) ? f.GetDouble() : 0;
+
+                SelectedFoodName = "";
+                await InvokeAsync(StateHasChanged);
+            }
+            else
+            {
+                await JS.InvokeVoidAsync("alert", "Product not found in OpenFoodFacts.");
+            }
+        }
+        catch
+        {
+            await JS.InvokeVoidAsync("alert", "Failed to retrieve barcode data.");
+        }
+    }
+
+    private async Task LogFavorite(string favoriteName)
+    {
+        var meal = new Meal { Name = favoriteName, LoggedAt = DateTime.UtcNow, UserId = 1 };
+        if (favoriteName == "Standard Morning Shake")
+        {
+            meal.Calories = 350; meal.Protein = 40; meal.Carbs = 30; meal.Fat = 8;
+        }
+        else if (favoriteName == "Chicken Rice Bowl")
+        {
+            meal.Calories = 500; meal.Protein = 45; meal.Carbs = 60; meal.Fat = 10;
+        }
+        await ApiClient.AddMealAsync(meal);
+        await LoadMeals();
+    }
+
+    private async Task LogYesterdayMeals()
+    {
+        if (meals == null) return;
+        var yesterdayMeals = meals.Where(m => DateTime.UtcNow.Subtract(m.LoggedAt).TotalDays is >= 1 and < 2).ToList();
+        if (!yesterdayMeals.Any()) 
+        {
+            await JS.InvokeVoidAsync("alert", "No meals found for yesterday.");
+            return;
+        }
+
+        foreach(var ym in yesterdayMeals)
+        {
+            var meal = new Meal { Name = ym.Name, Calories = ym.Calories, Protein = ym.Protein, Carbs = ym.Carbs, Fat = ym.Fat, LoggedAt = DateTime.UtcNow, UserId = 1 };
+            await ApiClient.AddMealAsync(meal);
+        }
+        await LoadMeals();
+        await JS.InvokeVoidAsync("alert", $"Copied {yesterdayMeals.Count} meals from yesterday!");
+    }
+
+    private class AiMealData
+    {
+        public string Name { get; set; } = "";
+        public double Calories { get; set; }
+        public double Protein { get; set; }
+        public double Carbs { get; set; }
+        public double Fat { get; set; }
+    }
+
+    private async Task ParseMeal()
+    {
+        var chatClient = Provider.GetService<ChatClient>();
+        if (chatClient == null)
+        {
+            await JS.InvokeVoidAsync("alert", "AI ChatClient not configured. Please add GitHubToken to user secrets.");
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(nlpInput)) return;
+
+        isParsing = true;
+        try
+        {
+            var prompt = $$"""
+                You are a nutrition extraction AI. Extract the nutritional info from the following meal description:
+                "{{nlpInput}}"
+
+                Respond ONLY with a valid JSON object matching this schema. Do not include markdown codeblocks or any backticks.
+                {
+                  "Name": "string (a concise summary name of the meal)",
+                  "Calories": number (estimated total calories),
+                  "Protein": number (estimated total protein in grams),
+                  "Carbs": number (estimated total carbs in grams),
+                  "Fat": number (estimated total fat in grams)
+                }
+                """;
+
+            var response = await chatClient.CompleteChatAsync(prompt);
+            var jsonString = response.Value.Content[0].Text?.Trim();
+
+            if (!string.IsNullOrEmpty(jsonString))
+            {
+                if (jsonString.StartsWith("```json"))
+                {
+                    jsonString = jsonString.Substring(7);
+                    if (jsonString.EndsWith("```")) jsonString = jsonString.Substring(0, jsonString.Length - 3);
+                }
+                else if (jsonString.StartsWith("```"))
+                {
+                    jsonString = jsonString.Substring(3);
+                    if (jsonString.EndsWith("```")) jsonString = jsonString.Substring(0, jsonString.Length - 3);
+                }
+
+                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                var data = JsonSerializer.Deserialize<AiMealData>(jsonString.Trim(), options);
+
+                if (data != null)
+                {
+                    newMealName = data.Name;
+                    newMealCalories = data.Calories;
+                    newProtein = data.Protein;
+                    newCarbs = data.Carbs;
+                    newFat = data.Fat;
+
+                    SelectedFoodName = ""; // Show manual entry fields
+                    Portion = 1.0;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            await JS.InvokeVoidAsync("alert", $"Failed to parse meal: {ex.Message}");
+        }
+        finally
+        {
+            isParsing = false;
+        }
+    }
 
     private IEnumerable<Meal> FilteredMeals => meals?
         .Where(m => string.IsNullOrWhiteSpace(Session.SearchQuery) || 
@@ -126,20 +444,41 @@
 
     private async Task AddMeal()
     {
-        if (string.IsNullOrWhiteSpace(newMealName)) return;
+        Meal meal;
 
-        var meal = new Meal
+        if (CurrentFood != null)
         {
-            Name = newMealName,
-            Calories = newMealCalories,
-            Protein = newProtein,
-            Carbs = newCarbs,
-            Fat = newFat,
-            LoggedAt = DateTime.UtcNow,
-            UserId = 1 
-        };
+            meal = new Meal
+            {
+                Name = $"{CurrentFood.Name} ({Portion} {SelectedMeasure})",
+                Calories = CalculatedCalories,
+                Protein = CalculatedProtein,
+                Carbs = CalculatedCarbs,
+                Fat = CalculatedFat,
+                LoggedAt = DateTime.UtcNow,
+                UserId = 1 
+            };
+        }
+        else
+        {
+            if (string.IsNullOrWhiteSpace(newMealName)) return;
+
+            meal = new Meal
+            {
+                Name = newMealName,
+                Calories = newMealCalories,
+                Protein = newProtein,
+                Carbs = newCarbs,
+                Fat = newFat,
+                LoggedAt = DateTime.UtcNow,
+                UserId = 1 
+            };
+        }
 
         await ApiClient.AddMealAsync(meal);
+
+        SelectedFoodName = "";
+        Portion = 1.0;
         newMealName = "";
         newMealCalories = 0;
         newProtein = 0;

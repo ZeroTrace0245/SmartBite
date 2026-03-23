@@ -1,4 +1,3 @@
-using System.Net.Http.Json;
 using computer_project.Web.Models;
 
 namespace computer_project.Web;
@@ -52,7 +51,16 @@ public class SmartBiteApiClient(HttpClient httpClient)
 
     public async Task<string> GetWaterAdviceAsync(double current, double target, CancellationToken ct = default)
     {
-        return await httpClient.GetStringAsync($"/water/advice?current={current}&target={target}", ct);
+        var response = await httpClient.GetAsync($"/water/advice?current={current}&target={target}", ct);
+        var text = await response.Content.ReadAsStringAsync(ct);
+        try
+        {
+            return System.Text.Json.JsonSerializer.Deserialize<string>(text) ?? text;
+        }
+        catch
+        {
+            return text;
+        }
     }
 
     public async Task AddWaterIntakeAsync(WaterIntake intake, CancellationToken ct = default)
@@ -80,7 +88,15 @@ public class SmartBiteApiClient(HttpClient httpClient)
     public async Task<string> GetAICoachAdviceAsync(string prompt, CancellationToken ct = default)
     {
         var response = await httpClient.PostAsJsonAsync("/ai/chat", new { prompt }, ct);
-        return await response.Content.ReadAsStringAsync(ct);
+        var text = await response.Content.ReadAsStringAsync(ct);
+        try
+        {
+            return System.Text.Json.JsonSerializer.Deserialize<string>(text) ?? text;
+        }
+        catch
+        {
+            return text;
+        }
     }
 
     public async Task<bool> RegisterUserAsync(string username, string password, CancellationToken ct = default)

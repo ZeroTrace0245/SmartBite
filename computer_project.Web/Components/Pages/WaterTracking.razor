@@ -1,7 +1,12 @@
 @page "/water"
 @using computer_project.Web.Models
 @using computer_project.Web.Components
+@using OpenAI.Chat
+@using Microsoft.Extensions.DependencyInjection
+@using System.Text.Json
 @inject SmartBiteApiClient ApiClient
+@inject IJSRuntime JS
+@inject IServiceProvider Provider
 @rendermode InteractiveServer
 
 <PageTitle>Water Tracking</PageTitle>
@@ -37,6 +42,20 @@
                         <button class="btn btn-primary ms-auto" @onclick="() => QuickAdd(customAmount)">Add Custom</button>
                         <input type="number" step="0.1" class="form-control w-25" @bind="customAmount" />
                     </div>
+                    <div class="mt-3 pt-3 border-top">
+                        <label class="form-label small fw-bold text-primary">Smart Log with AI</label>
+                        <div class="d-flex gap-2">
+                            <input class="form-control" @bind="hydrationInput" placeholder="e.g. I drank one bottle of water" />
+                            <button class="btn btn-outline-primary" @onclick="EstimateHydrationFromText" disabled="@isEstimatingHydration">
+                                @if (isEstimatingHydration) { <span class="spinner-border spinner-border-sm me-2"></span> }
+                                Estimate Liters
+                            </button>
+                        </div>
+                        @if (!string.IsNullOrWhiteSpace(hydrationEstimateMessage))
+                        {
+                            <p class="small text-muted mb-0 mt-2">@hydrationEstimateMessage</p>
+                        }
+                    </div>
                 </div>
             </div>
         </div>
@@ -70,11 +89,19 @@
 </ConsumerOnly>
 
 @code {
+    private class AiHydrationData
+    {
+        public double Liters { get; set; }
+    }
+
     private List<WaterIntake>? intakes;
     private UserGoal? goal;
     private double totalWater => intakes?.Where(i => i.LoggedAt.Date == DateTime.UtcNow.Date).Sum(i => i.Amount) ?? 0;
     private double progressPercent => Math.Min(100, (totalWater / (goal?.TargetWater ?? 2.5)) * 100);
     private double customAmount = 0.25;
+    private string hydrationInput = "";
+    private bool isEstimatingHydration = false;
+    private string hydrationEstimateMessage = "";
 
     protected override async Task OnInitializedAsync()
     {
@@ -100,5 +127,76 @@
         };
         await ApiClient.AddWaterIntakeAsync(intake);
         await LoadIntakes();
+    }
+
+    private async Task EstimateHydrationFromText()
+    {
+        hydrationEstimateMessage = string.Empty;
+
+        if (string.IsNullOrWhiteSpace(hydrationInput))
+        {
+            return;
+        }
+
+        var chatClient = Provider.GetService<ChatClient>();
+        if (chatClient == null)
+        {
+            await JS.InvokeVoidAsync("alert", "AI ChatClient not configured. Please add GitHubToken to user secrets.");
+            return;
+        }
+
+        isEstimatingHydration = true;
+        try
+        {
+            var prompt = $$"""
+                You are a hydration parser. Convert the following drinking note into liters:
+                "{{hydrationInput}}"
+
+                Respond ONLY with a valid JSON object matching this schema. Do not include markdown codeblocks or any backticks.
+                {
+                  "Liters": number (total liters consumed, e.g. 0.5)
+                }
+                """;
+
+            var response = await chatClient.CompleteChatAsync(prompt);
+            var jsonString = response.Value.Content[0].Text?.Trim();
+
+            if (string.IsNullOrWhiteSpace(jsonString))
+            {
+                hydrationEstimateMessage = "Could not estimate hydration from your text.";
+                return;
+            }
+
+            if (jsonString.StartsWith("```json"))
+            {
+                jsonString = jsonString.Substring(7);
+                if (jsonString.EndsWith("```")) jsonString = jsonString.Substring(0, jsonString.Length - 3);
+            }
+            else if (jsonString.StartsWith("```"))
+            {
+                jsonString = jsonString.Substring(3);
+                if (jsonString.EndsWith("```")) jsonString = jsonString.Substring(0, jsonString.Length - 3);
+            }
+
+            var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+            var data = JsonSerializer.Deserialize<AiHydrationData>(jsonString.Trim(), options);
+
+            if (data == null || data.Liters <= 0)
+            {
+                hydrationEstimateMessage = "Could not estimate hydration from your text.";
+                return;
+            }
+
+            customAmount = Math.Round(data.Liters, 2);
+            hydrationEstimateMessage = $"Estimated {customAmount:F2} L. You can now click Add Custom to save it.";
+        }
+        catch (Exception ex)
+        {
+            await JS.InvokeVoidAsync("alert", $"Failed to estimate hydration: {ex.Message}");
+        }
+        finally
+        {
+            isEstimatingHydration = false;
+        }
     }
 }

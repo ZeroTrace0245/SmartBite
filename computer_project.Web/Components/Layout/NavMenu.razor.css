@@ -79,10 +79,6 @@
 }
 
 .nav-scrollable {
-    display: none;
-}
-
-.navbar-toggler:checked ~ .nav-scrollable {
     display: block;
 }
 
