@@ -56,6 +56,7 @@ Pathway-specific personalization (Gym, Diet, General/Wellness) was introduced, a
 - Figure 11: Pathway Decision Flow Diagram (`Appendix I`)
 - Figure 12: SmartBite ER Diagram (`Appendix I`)
 - Figure 13: User Interaction / Use-Case Diagram (`Appendix I`)
+- Figure 14: High-Level Architecture Diagram (`Appendix I`)
 
 ### Tables
 - Table 1: Functional Requirements  
@@ -873,4 +874,57 @@ flowchart LR
     U4 -. AI estimation .-> AI
     U6 -. AI insights .-> AI
     U7 -. conversation .-> AI
+```
+
+#### I.4 High-Level Architecture Diagram
+```mermaid
+flowchart LR
+    subgraph ClientLayer[Client Layer]
+        Web[Blazor Web App\ncomputer_project.Web]
+        Mobile[Android App\nKotlin + Compose]
+    end
+
+    subgraph EdgeLayer[Edge / API Layer]
+        Api[Minimal API Service\ncomputer_project.ApiService]
+    end
+
+    subgraph ServiceLayer[Application Services]
+        Auth[Auth & Session Logic]
+        Tracking[Tracking Modules\nMeals/Water/Shopping]
+        Reports[Reports & Analytics]
+        AIAgent[AIService\nGitHub Models Integration]
+    end
+
+    subgraph DataLayer[Data & Infrastructure]
+        Pg[(PostgreSQL\nsmartbitedb)]
+        Redis[(Redis Cache)]
+    end
+
+    subgraph OpsLayer[Orchestration & Hosting]
+        Aspire[.NET Aspire AppHost\ncomputer_project.AppHost]
+        Azure[Azure Container Apps]
+    end
+
+    Web --> Api
+    Mobile --> Api
+
+    Api --> Auth
+    Api --> Tracking
+    Api --> Reports
+    Api --> AIAgent
+
+    Tracking --> Pg
+    Reports --> Pg
+    Auth --> Pg
+    Api --> Redis
+
+    AIAgent --> Api
+
+    Aspire --> Web
+    Aspire --> Api
+    Aspire --> Redis
+    Aspire --> Pg
+
+    Web --> Azure
+    Api --> Azure
 ```
