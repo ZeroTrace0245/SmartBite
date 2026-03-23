@@ -139,7 +139,7 @@ You can test the hosted app here:
 | Area | Old | New |
 | --- | --- | --- |
 | Home | ![Old Home](<screenshots/Home page.png>) | ![New Home](<screenshots/Web app NEW/New homepage.png>) |
-| Dashboard | ![Old Dashboard](<screenshots/Dashboard.gif>) | ![New Dashboard](<screenshots/Web app NEW/New pathway pesonalized Dashboard (genaral users).png>) |
+| Dashboard | ![Old Dashboard](<https://github.com/ZeroTrace0245/SmartBite/blob/660ad95083b145e4f9bcc78db00bc43bad0b8c43/screenshots/Dashboard.gif>) | ![New Dashboard](<screenshots/Web app NEW/New pathway pesonalized Dashboard (genaral users).png>) |
 | Hydration | ![Old Hydration](<screenshots/Hydration.png>) | ![New Hydration](<screenshots/Web app NEW/New Hydration with AI.png>) |
 | Performance | ![Old Performance](<screenshots/Performance.png>) | ![New Performance](<screenshots/Web app NEW/New Performance.png>) |
 | Labs | ![Old Labs](<screenshots/Labs.png>) | ![New Labs](<screenshots/Web app NEW/New labs.png>) |
