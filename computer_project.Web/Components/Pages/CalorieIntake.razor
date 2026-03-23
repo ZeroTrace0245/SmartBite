@@ -1,0 +1,38 @@
+@page "/calorie-intake"
+@using computer_project.Web.Services
+@inject UserSession Session
+@rendermode InteractiveServer
+
+<PageTitle>Calorie Intake - SmartBite</PageTitle>
+
+<div class="px-md-4 py-4">
+    <div class="d-flex justify-content-between align-items-end mb-4">
+        <div>
+            <div class="breadcrumb-small mb-1 text-uppercase ls-widest fw-bold opacity-75 text-success">Diet Focus</div>
+            <h1 class="display-6 fw-bold mb-0">Calorie Intake</h1>
+        </div>
+        <button class="btn btn-success btn-sm shadow px-4 py-2 rounded-3"><i class="bi bi-journal-plus me-2"></i>Log Meal</button>
+    </div>
+
+    <div class="card p-4 border-0 shadow-sm border-bottom border-success border-3 mb-4">
+        <div class="row align-items-center text-center text-md-start">
+            <div class="col-md-3 border-end">
+                <div class="text-muted small fw-bold mb-1 text-uppercase ls-wide">Consumed</div>
+                <div class="display-5 fw-bold text-success">1,450</div>
+            </div>
+            <div class="col-md-6 px-md-5 my-4 my-md-0 d-flex flex-column align-items-center">
+                <div class="d-flex justify-content-between w-100 mb-2 small fw-bold text-muted">
+                    <span>0 kcal</span>
+                    <span>Goal: 2,200</span>
+                </div>
+                <div class="progress w-100" style="height: 12px;">
+                    <div class="progress-bar bg-success" style="width: 65%"></div>
+                </div>
+            </div>
+            <div class="col-md-3 border-start">
+                <div class="text-muted small fw-bold mb-1 text-uppercase ls-wide">Remaining</div>
+                <div class="display-5 fw-bold text-dark">750</div>
+            </div>
+        </div>
+    </div>
+</div>

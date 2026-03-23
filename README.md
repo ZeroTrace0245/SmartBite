@@ -1,14 +1,31 @@
-# SmartBite
+﻿# SmartBit (formerly SmartBite)
 
-> A Blazor-based health companion — meal logging, water tracking, grocery planning, and role-aware access in a single repo.
+> A professional Blazor-based health companion — meal logging, water tracking, grocery planning, and role-aware access with enterprise-ready MSI installer.
 
 > ⚠️ **Requires .NET 10 or .NET 11 Preview SDK.** Earlier SDK versions are not supported.
+
+[![.NET Version](https://img.shields.io/badge/.NET-11%20Preview-512BD4?logo=dotnet)](https://dotnet.microsoft.com/)
+[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE.md)
+[![GitHub Release](https://img.shields.io/badge/Release-v1.0-blue)](https://github.com/ZeroTrace0245/SmartBit/releases)
+[![Platform](https://img.shields.io/badge/Platform-Windows%2010%2F11-0078D6?logo=windows)](https://www.microsoft.com/windows)
 
 ---
 
 ## Overview
 
-SmartBite helps end users track daily calories/macros, water intake, and groceries while giving admins control over settings and user management. The UI uses a mica/acrylic-inspired theme with light/dark toggle, sticky navigation, and CSV data exports.
+SmartBit helps end users track daily calories/macros, water intake, and groceries while giving admins control over settings and user management. The UI uses a mica/acrylic-inspired theme with light/dark toggle, sticky navigation, and CSV data exports.
+
+### 🎁 **NEW: Professional Installation Package**
+
+SmartBit now includes a **professional MSI installer** for enterprise deployment:
+- ✅ **Windows Installer Package (.msi)** - 90.8 MB
+- ✅ **Add/Remove Programs Integration**
+- ✅ **Start Menu & Desktop Shortcuts**
+- ✅ **Group Policy Deployment Ready**
+- ✅ **Silent Installation Support**
+- ✅ **Automatic Uninstaller**
+
+📦 **Download:** [SmartBit-v1.0-Setup.msi](MSI-Installer/Output/SmartBit-v1.0-Setup.msi)
 
 ---
 
@@ -159,6 +176,7 @@ erDiagram
 ### Development Methodology
 - Iterative/incremental: features added in vertical slices (UI + API + model per feature).
 - Source control via Git on GitHub (`master` branch, feature commits).
+- Professional installation packaging via WiX Toolset v3.
 
 ### Programming Languages and Tools
 | Tool / Language | Purpose |
@@ -167,9 +185,11 @@ erDiagram
 | Razor (`.razor`) | Component markup and rendering |
 | HTML / CSS | Layout, styling, mica/acrylic effects |
 | JavaScript | Theme toggle and file download via `IJSRuntime` |
-| PowerShell / dotnet CLI | Build, restore, run, watch |
+| PowerShell / dotnet CLI | Build, restore, run, watch, packaging |
 | Visual Studio 2026 Insiders | Primary IDE |
 | Git + GitHub | Version control and collaboration |
+| WiX Toolset v3 | MSI installer creation |
+| Inno Setup | Alternative installer option |
 
 ### Third-Party Components and Libraries
 | Library | Role |
@@ -178,6 +198,7 @@ erDiagram
 | Bootstrap Icons | Icon set (`bi bi-*`) used across the UI |
 | Entity Framework Core + SQLite | ORM and persistent data access (`SmartBite.db`) |
 | .NET Aspire (`ServiceDefaults`) | Shared service wiring and defaults |
+| WiX Toolset | Windows Installer XML for MSI packaging |
 
 ### Algorithms
 - **Macro aggregation**: server-side LINQ summation of calories, protein, carbs, fat across logged meals to produce `HealthReport`.
@@ -188,12 +209,26 @@ erDiagram
 
 ## Implementation Progress
 
-### Development Environment Setup
+### Installation Options
+
+#### Option 1: MSI Installer (Recommended for End Users)
+1. Download [SmartBit-v1.0-Setup.msi](MSI-Installer/Output/SmartBit-v1.0-Setup.msi)
+2. Double-click to install
+3. Launch from Start Menu or Desktop shortcut
+
+**Silent Installation:**
+```cmd
+msiexec /i "SmartBit-v1.0-Setup.msi" /quiet
+```
+
+See [MSI-INSTALLER-COMPLETE.md](MSI-INSTALLER-COMPLETE.md) for full installation guide.
+
+#### Option 2: Development Environment Setup (For Developers)
 1. Install the [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0) or the [.NET 11 Preview SDK](https://dotnet.microsoft.com/download/dotnet/11.0).
 2. Clone the repository:
    ```bash
-   git clone https://github.com/ZeroTrace0245/computer_project.git
-   cd computer_project
+   git clone https://github.com/ZeroTrace0245/SmartBit.git
+   cd SmartBit
    ```
 3. Restore dependencies:
    ```bash
@@ -208,6 +243,35 @@ erDiagram
    dotnet watch --project computer_project.Web
    ```
 
+### Building Your Own Installer
+
+#### Quick Build (ZIP Package)
+```powershell
+.\Build-Installer.ps1
+```
+Output: `Installer-Output\SmartBit-v1.0-Setup.zip`
+
+#### Professional MSI Build
+Prerequisites: WiX Toolset v3
+```powershell
+winget install WiXToolset.WiXToolset
+.\Build-Installer.ps1  # Build application package first
+
+# Compile MSI
+& "C:\Program Files (x86)\WiX Toolset v3.14\bin\candle.exe" `
+    ".\MSI-Installer\SmartBit.wxs" `
+    -out ".\MSI-Installer\SmartBit.wixobj" `
+    -ext WixUIExtension -arch x64
+
+# Link to MSI
+& "C:\Program Files (x86)\WiX Toolset v3.14\bin\light.exe" `
+    ".\MSI-Installer\SmartBit.wixobj" `
+    -out ".\MSI-Installer\Output\SmartBit-v1.0-Setup.msi" `
+    -ext WixUIExtension -cultures:en-us -sval
+```
+
+See [MSI-INSTALLER-GUIDE.md](MSI-INSTALLER-GUIDE.md) for detailed build instructions.
+
 ### Implemented Features
 | Feature | Status | Details |
 | --- | --- | --- |
@@ -215,10 +279,14 @@ erDiagram
 | Dashboard & reports | ✅ Done | Daily summary cards, CSV export, tips |
 | Water tracking | ✅ Done | Log intakes, view history |
 | Shopping list | ✅ Done | Add/delete items, payment tagging, checkout tracker |
+| **Payment methods** | ✅ Done | Cash, Credit Card, Apple Pay, Google Pay, Bank Transfer |
+| **Third-party payment integration** | ✅ Done | PayPal and Stripe checkout simulation |
 | Role-based access | ✅ Done | Admin-only Settings; consumers blocked |
 | Light/dark theme | ✅ Done | JS interop toggle, mica/acrylic effects |
 | Feedback page | ✅ Done | Contact/help entry point |
 | User registration/login | ✅ Done | Simple credential flow (demo, no hashing) |
+| **MSI Installer** | ✅ Done | Professional Windows Installer package |
+| **ZIP Package** | ✅ Done | Portable installation package |
 | AI Health Coach | ⚠️ In Progress | Chat-based nutrition advice via AI Foundry Local — runs entirely on-device, no API keys needed |
 
 ---
@@ -266,43 +334,57 @@ erDiagram
 
 ## File Structure
 ```
-computer_project.Web/              # Blazor UI
-  Components/
-    Layout/
-      MainLayout.razor
-      NavMenu.razor
-    Pages/
-      Home.razor
-      Dashboard.razor
-      Feedback.razor
-      Settings.razor
-      ShoppingList.razor
-      MealLogging.razor
-      WaterTracking.razor
-      Reports.razor
-      Labs.razor
-      Login.razor
-      Register.razor
-  Services/
-    UserSession.cs
-  SmartBiteApiClient.cs
-  Models.cs
-  wwwroot/
-    app.css
-
-computer_project.ApiService/       # Backend API
-  Program.cs
-  Models.cs
-  Data/
-    AppDbContext.cs
-  Services/
-    AIService.cs
-
-computer_project.ServiceDefaults/  # Shared service wiring
-  Extensions.cs
-
-computer_project.AppHost/          # Host / bootstrap
-  Program.cs
+SmartBit/
+├── computer_project.Web/              # Blazor UI
+│   ├── Components/
+│   │   ├── Layout/
+│   │   │   ├── MainLayout.razor
+│   │   │   └── NavMenu.razor
+│   │   └── Pages/
+│   │       ├── Home.razor
+│   │       ├── Dashboard.razor
+│   │       ├── Feedback.razor
+│   │       ├── Settings.razor
+│   │       ├── ShoppingList.razor
+│   │       ├── MealLogging.razor
+│   │       ├── WaterTracking.razor
+│   │       ├── Reports.razor
+│   │       ├── Labs.razor
+│   │       ├── Login.razor
+│   │       ├── Register.razor
+│   │       ├── PaymentModal.razor          # NEW: Payment method selector
+│   │       └── ThirdPartyPayment.razor     # NEW: PayPal/Stripe integration
+│   ├── Services/
+│   │   └── UserSession.cs                  # Session management with payment preferences
+│   ├── SmartBiteApiClient.cs
+│   ├── Models.cs
+│   └── wwwroot/
+│       └── app.css
+├── computer_project.ApiService/       # Backend API
+│   ├── Program.cs
+│   ├── Models.cs
+│   ├── Data/
+│   │   └── AppDbContext.cs
+│   └── Services/
+│       └── AIService.cs
+├── computer_project.ServiceDefaults/  # Shared service wiring
+│   └── Extensions.cs
+├── computer_project.AppHost/          # Host / bootstrap
+│   └── Program.cs
+├── MSI-Installer/                     # NEW: MSI installer source
+│   ├── SmartBit.wxs                   # WiX source file
+│   └── Output/
+│       └── SmartBit-v1.0-Setup.msi    # Built MSI package
+├── Installer-Output/                  # NEW: Portable packages
+│   ├── SmartBit/                      # Application files
+│   └── SmartBit-v1.0-Setup.zip        # ZIP distribution
+├── Build-Installer.ps1                # NEW: Build portable package
+├── MSI-INSTALLER-COMPLETE.md          # NEW: MSI installation guide
+├── MSI-INSTALLER-GUIDE.md             # NEW: MSI creation guide
+├── PAYMENT_ENHANCEMENT_GUIDE.md       # NEW: Payment feature documentation
+├── CONTRIBUTING.md                    # Contribution guidelines
+├── LICENSE.md                         # MIT License
+└── README.md                          # This file
 ```
 
 ---
@@ -466,6 +548,63 @@ The AI Coach page in SmartBite will show a live connection status indicator — 
 
 ---
 
+## Distribution & Deployment
+
+### End-User Installation
+
+SmartBit provides multiple installation options for different scenarios:
+
+#### 1. MSI Installer (Recommended)
+**Best for:** Windows users, corporate environments, group policy deployment
+
+- Download: [SmartBit-v1.0-Setup.msi](MSI-Installer/Output/SmartBit-v1.0-Setup.msi)
+- Size: 90.8 MB
+- Features: Auto-uninstaller, Start Menu shortcuts, Add/Remove Programs integration
+
+**Installation:**
+```cmd
+# Interactive
+msiexec /i "SmartBit-v1.0-Setup.msi"
+
+# Silent
+msiexec /i "SmartBit-v1.0-Setup.msi" /quiet
+```
+
+📖 See [MSI-INSTALLER-COMPLETE.md](MSI-INSTALLER-COMPLETE.md) for complete guide.
+
+#### 2. ZIP Package (Portable)
+**Best for:** Quick testing, portable installations
+
+- Download: [SmartBit-v1.0-Setup.zip](Installer-Output/SmartBit-v1.0-Setup.zip)
+- Extract and run `Start-SmartBit.bat`
+
+### Enterprise Deployment
+
+#### Group Policy Deployment
+1. Copy `SmartBit-v1.0-Setup.msi` to network share
+2. Open Group Policy Management Console
+3. Navigate to: Computer Configuration → Policies → Software Settings → Software Installation
+4. Right-click → New → Package
+5. Select the MSI file
+
+#### SCCM/Intune Deployment
+The MSI package is compatible with System Center Configuration Manager and Microsoft Intune for enterprise software distribution.
+
+#### Silent Installation for Mass Deployment
+```cmd
+msiexec /i "\\network-share\SmartBit-v1.0-Setup.msi" /quiet /l*v "C:\Logs\smartbit-install.log"
+```
+
+### System Requirements
+- **OS:** Windows 10 (1809+) or Windows 11
+- **Architecture:** x64 (64-bit)
+- **.NET Runtime:** Included (self-contained)
+- **Disk Space:** ~200 MB
+- **RAM:** 512 MB minimum, 1 GB recommended
+- **Optional:** AI Foundry Local for AI features
+
+---
+
 ## Future Plans
 - ⚠️ **AI features full release**: The AI Health Coach, nutrition estimation, and recommendation features are currently work in progress. A stable release is planned once testing and prompt tuning are complete.
 - ⚠️ **AI Foundry Local integration**: In a future release, the AI backend may be updated to support AI Foundry Local, allowing for the users to run models locally.
@@ -481,4 +620,47 @@ The AI Coach page in SmartBite will show a live connection status indicator — 
 
 ## Contributing
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for the ownership quick-reference table and contributor details.
+We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on:
+- Code standards and conventions
+- Branching strategy
+- Pull request process
+- Testing requirements
+- Installer packaging guidelines
+
+### Quick Contribution Guide
+
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feature/your-feature-name`
+3. Make your changes and test thoroughly
+4. Update documentation if needed
+5. Submit a pull request with a clear description
+
+For detailed contribution guidelines, ownership information, and development workflows, see [CONTRIBUTING.md](CONTRIBUTING.md).
+
+---
+
+## License
+
+This project is licensed under the MIT License - see [LICENSE.md](LICENSE.md) for details.
+
+---
+
+## Acknowledgments
+
+- Microsoft for .NET and Blazor frameworks
+- WiX Toolset for professional installer creation
+- Bootstrap team for responsive UI components
+- Entity Framework Core team for data access
+- AI Foundry Local team for on-device AI capabilities
+
+---
+
+## Support & Contact
+
+- **Issues:** [GitHub Issues](https://github.com/ZeroTrace0245/SmartBit/issues)
+- **Discussions:** [GitHub Discussions](https://github.com/ZeroTrace0245/SmartBit/discussions)
+- **Documentation:** Check the `docs/` folder and `.md` files in the repository
+
+---
+
+**Made with ❤️ using .NET 11, Blazor, and modern Windows installer technology**

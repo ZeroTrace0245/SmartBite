@@ -1,8 +1,12 @@
 @page "/dashboard"
 @using computer_project.Web.Models
 @using computer_project.Web.Services
+@using OpenAI.Chat
+@using Microsoft.Extensions.DependencyInjection
 @inject SmartBiteApiClient ApiClient
 @inject UserSession Session
+@inject IJSRuntime JS
+@inject IServiceProvider Provider
 @rendermode InteractiveServer
 
 <PageTitle>Dashboard - SmartBite</PageTitle>
@@ -10,8 +14,21 @@
 <ConsumerOnly>
     <div class="dashboard-header d-flex justify-content-between align-items-end mb-5">
         <div>
-            <div class="breadcrumb-small mb-1 text-uppercase ls-widest fw-bold opacity-75">Analytics Overview</div>
-            <h1 class="display-6 fw-bold mb-0">Health Insights</h1>
+            @if (Session.CurrentUser?.Pathway == "Gym")
+            {
+                <div class="breadcrumb-small mb-1 text-uppercase ls-widest fw-bold opacity-75 text-danger">Gym Focus Overview</div>
+                <h1 class="display-6 fw-bold mb-0">Performance Insights</h1>
+            }
+            else if (Session.CurrentUser?.Pathway == "Diet")
+            {
+                <div class="breadcrumb-small mb-1 text-uppercase ls-widest fw-bold opacity-75 text-success">Diet Focus Overview</div>
+                <h1 class="display-6 fw-bold mb-0">Nutrition & Planning</h1>
+            }
+            else
+            {
+                <div class="breadcrumb-small mb-1 text-uppercase ls-widest fw-bold opacity-75 text-primary">Wellness Overview</div>
+                <h1 class="display-6 fw-bold mb-0">Daily Habits Status</h1>
+            }
             <div class="text-muted small mt-1">
                 <i class="bi bi-geo-alt me-1"></i> @goal?.Region <span class="mx-2">|</span> 
                 <i class="bi bi-clock me-1"></i> @Session.ToLocalTime(DateTime.UtcNow).ToString("f")
@@ -73,239 +90,400 @@
             <p class="mt-2 text-muted">Synchronizing your health data...</p>
         </div>
     }
-    else
+    else if (Session.CurrentUser?.Pathway == "Gym")
     {
-        <!-- Top Summary Cards -->
+        <!-- Gym Members Theme (Red) -->
         <div class="row g-4 mb-5">
             <div class="col-md-3">
-                <div class="card p-4 border-0 shadow-sm hover-up">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <div>
-                            <div class="text-muted small fw-bold mb-2 text-uppercase ls-wide">Energy</div>
-                            <div class="h2 fw-bold mb-1">@report.TotalCalories.ToString("N0") <span class="h6 text-muted fw-normal">kcal</span></div>
-                            <div class="growth-indicator text-success"><i class="bi bi-graph-up-arrow me-1"></i> +12%</div>
-                        </div>
-                        <div class="stat-card-icon bg-danger bg-opacity-10 text-danger rounded-4 shadow-sm" style="width: 56px; height: 56px;">
-                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                <a href="calories" class="text-decoration-none text-dark d-block">
+                    <div class="card p-4 border-0 shadow-sm hover-up border-bottom border-danger border-3">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <div class="text-muted small fw-bold mb-2 text-uppercase ls-wide">Calories Burned</div>
+                                <div class="h2 fw-bold mb-1">840 <span class="h6 text-muted fw-normal">kcal</span></div>
+                                <div class="growth-indicator text-success"><i class="bi bi-graph-up-arrow me-1"></i> On track</div>
+                            </div>
+                            <div class="stat-card-icon bg-danger bg-opacity-10 text-danger rounded-4 shadow-sm" style="width: 56px; height: 56px;">
+                                <i class="bi bi-fire fs-4"></i>
+                            </div>
                         </div>
                     </div>
-                </div>
+                </a>
             </div>
             <div class="col-md-3">
-                <div class="card p-4 border-0 shadow-sm hover-up">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <div>
-                            <div class="text-muted small fw-bold mb-2 text-uppercase ls-wide">Protein</div>
-                            <div class="h2 fw-bold mb-1">@(report.Protein / Math.Max(1, report.MealCount)).ToString("F1") <span class="h6 text-muted fw-normal">g</span></div>
-                            <div class="growth-indicator text-success"><i class="bi bi-graph-up-arrow me-1"></i> +5%</div>
-                        </div>
-                        <div class="stat-card-icon bg-success bg-opacity-10 text-success rounded-4 shadow-sm" style="width: 56px; height: 56px;">
-                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                <a href="workouts" class="text-decoration-none text-dark d-block">
+                    <div class="card p-4 border-0 shadow-sm hover-up border-bottom border-danger border-3">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <div class="text-muted small fw-bold mb-2 text-uppercase ls-wide">Workout Vol</div>
+                                <div class="h2 fw-bold mb-1">12K <span class="h6 text-muted fw-normal">lbs</span></div>
+                                <div class="growth-indicator text-success"><i class="bi bi-graph-up-arrow me-1"></i> +5% limit</div>
+                            </div>
+                            <div class="stat-card-icon bg-danger bg-opacity-10 text-danger rounded-4 shadow-sm" style="width: 56px; height: 56px;">
+                                <i class="bi bi-activity fs-4"></i>
+                            </div>
                         </div>
                     </div>
-                </div>
+                </a>
             </div>
             <div class="col-md-3">
-                <div class="card p-4 border-0 shadow-sm hover-up">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <div>
-                            <div class="text-muted small fw-bold mb-2 text-uppercase ls-wide">Hydration</div>
-                            <div class="h2 fw-bold mb-1">@totalWater.ToString("F1") <span class="h6 text-muted fw-normal">L</span></div>
-                            <div class="growth-indicator text-danger"><i class="bi bi-graph-down-arrow me-1"></i> -2%</div>
-                        </div>
-                        <div class="stat-card-icon bg-primary bg-opacity-10 text-primary rounded-4 shadow-sm" style="width: 56px; height: 56px;">
-                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>
+                <a href="supplements" class="text-decoration-none text-dark d-block">
+                    <div class="card p-4 border-0 shadow-sm hover-up border-bottom border-danger border-3">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <div class="text-muted small fw-bold mb-2 text-uppercase ls-wide">Supplements</div>
+                                <div class="h2 fw-bold mb-1">2/3 <span class="h6 text-muted fw-normal">taken</span></div>
+                                <div class="growth-indicator text-warning"><i class="bi bi-clock me-1"></i> Next: Whey</div>
+                            </div>
+                            <div class="stat-card-icon bg-danger bg-opacity-10 text-danger rounded-4 shadow-sm" style="width: 56px; height: 56px;">
+                                <i class="bi bi-capsule fs-4"></i>
+                            </div>
                         </div>
                     </div>
-                </div>
+                </a>
             </div>
             <div class="col-md-3">
-                <div class="card p-4 border-0 shadow-sm hover-up">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <div>
-                            <div class="text-muted small fw-bold mb-2 text-uppercase ls-wide">Fitness</div>
-                            <div class="h2 fw-bold mb-1">84<span class="h6 text-muted fw-normal">%</span></div>
-                            <div class="growth-indicator text-success"><i class="bi bi-stars me-1"></i> Peak</div>
-                        </div>
-                        <div class="stat-card-icon bg-warning bg-opacity-10 text-warning rounded-4 shadow-sm" style="width: 56px; height: 56px;">
-                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+                <a href="recovery" class="text-decoration-none text-dark d-block">
+                    <div class="card p-4 border-0 shadow-sm hover-up border-bottom border-danger border-3">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <div class="text-muted small fw-bold mb-2 text-uppercase ls-wide">Recovery</div>
+                                <div class="h2 fw-bold mb-1">92<span class="h6 text-muted fw-normal">%</span></div>
+                                <div class="growth-indicator text-success"><i class="bi bi-stars me-1"></i> Ready</div>
+                            </div>
+                            <div class="stat-card-icon bg-danger bg-opacity-10 text-danger rounded-4 shadow-sm" style="width: 56px; height: 56px;">
+                                <i class="bi bi-battery-charging fs-4"></i>
+                            </div>
                         </div>
                     </div>
-                </div>
+                </a>
             </div>
         </div>
 
-        <!-- Main Charts Row -->
         <div class="row g-4 mb-4">
             <div class="col-lg-8">
                 <div class="card border-0 p-4 h-100">
                     <div class="d-flex justify-content-between mb-4">
-                        <h5 class="fw-bold m-0">Calorie Intake Trend</h5>
+                        <h5 class="fw-bold m-0 text-danger">Progress Dashboard (Strength Gains)</h5>
                         <div class="dropdown">
-                            <button class="btn btn-sm btn-light border">Last 7 days <i class="bi bi-chevron-down ms-1"></i></button>
+                            <button class="btn btn-sm btn-light border">Bench Press <i class="bi bi-chevron-down ms-1"></i></button>
                         </div>
                     </div>
                     <div class="chart-container-large position-relative">
                         <svg width="100%" height="100%" viewBox="0 0 800 300" preserveAspectRatio="none">
                             <defs>
-                                <linearGradient id="chartGradient" x1="0" y1="0" x2="0" y2="1">
-                                    <stop offset="5%" stop-color="#0078d4" stop-opacity="0.3"/>
-                                    <stop offset="95%" stop-color="#0078d4" stop-opacity="0"/>
+                                <linearGradient id="gymGradient" x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="5%" stop-color="#dc3545" stop-opacity="0.3"/>
+                                    <stop offset="95%" stop-color="#dc3545" stop-opacity="0"/>
                                 </linearGradient>
                             </defs>
-                            <!-- Grid lines -->
-                            @for (int i = 0; i <= 4; i++)
-                            {
-                                <line x1="0" y1="@(i * 75)" x2="800" y2="@(i * 75)" stroke="#f0f0f0" stroke-width="1" />
-                            }
-                            
-                            <!-- Smooth Area/Line Chart Path -->
-                            <path class="area-path" d="M0,300 L0,220 C100,200 200,280 300,240 C400,200 500,100 600,80 C700,60 800,90 800,90 L800,300 Z" />
-                            <path class="line-path" d="M0,220 C100,200 200,280 300,240 C400,200 500,100 600,80 C700,60 800,90 800,90" />
-                            
-                            <!-- Points -->
-                            <circle cx="300" cy="240" r="4" fill="#fff" stroke="#0078d4" stroke-width="2" />
-                            <circle cx="600" cy="80" r="4" fill="#fff" stroke="#0078d4" stroke-width="2" />
+                            @for (int i = 0; i <= 4; i++) { <line x1="0" y1="@(i * 75)" x2="800" y2="@(i * 75)" stroke="#f0f0f0" stroke-width="1" /> }
+                            <path class="area-path" d="M0,300 L0,250 C100,240 200,200 300,210 C400,180 500,160 600,120 C700,90 800,80 800,80 L800,300 Z" style="fill: url(#gymGradient);" />
+                            <path class="line-path" d="M0,250 C100,240 200,200 300,210 C400,180 500,160 600,120 C700,90 800,80 800,80" stroke="#dc3545" stroke-width="3" fill="none"/>
+                            <circle cx="300" cy="210" r="5" fill="#fff" stroke="#dc3545" stroke-width="2" />
+                            <circle cx="600" cy="120" r="5" fill="#fff" stroke="#dc3545" stroke-width="2" />
                         </svg>
-                        <div class="d-flex justify-content-between mt-2 text-muted small">
-                            <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
-                        </div>
                     </div>
                 </div>
             </div>
             <div class="col-lg-4">
-                <div class="card border-0 p-4 h-100">
-                    <h5 class="fw-bold mb-4">Macro Distribution</h5>
-                    <div class="donut-chart-box mb-4 py-4">
-                        <svg width="220" height="220" viewBox="0 0 42 42" class="chart-pie-svg filter-shadow">
-                            <circle cx="21" cy="21" r="15.91549430918954" fill="transparent" stroke="var(--win11-bg)" stroke-width="6" opacity="0.1"></circle>
-                            
-                            @{
-                                double p = GetMacroPct(report.Protein, report.Carbs, report.Fat, "protein");
-                                double c = GetMacroPct(report.Protein, report.Carbs, report.Fat, "carbs");
-                                double f = GetMacroPct(report.Protein, report.Carbs, report.Fat, "fat");
-                            }
-
-                            <circle cx="21" cy="21" r="15.91549430918954" fill="transparent" stroke="#0078d4" stroke-width="7" 
-                                    stroke-dasharray="@($"{p} {100-p}")" stroke-dashoffset="25" stroke-linecap="round"></circle>
-                            
-                            <circle cx="21" cy="21" r="15.91549430918954" fill="transparent" stroke="#107c10" stroke-width="7" 
-                                    stroke-dasharray="@($"{c} {100-c}")" stroke-dashoffset="@(25 - p)" stroke-linecap="round"></circle>
-
-                            <circle cx="21" cy="21" r="15.91549430918954" fill="transparent" stroke="#d83b01" stroke-width="7" 
-                                    stroke-dasharray="@($"{f} {100-f}")" stroke-dashoffset="@(25 - p - c)" stroke-linecap="round"></circle>
-                        </svg>
-                        <div class="donut-label">
-                            <div class="h3 fw-bold mb-0">@((p+c+f > 0 ? 100 : 0))%</div>
-                            <div class="small text-muted text-uppercase ls-wide">Complete</div>
+                <div class="card border-0 p-4 h-100 bg-danger text-white hover-up shadow">
+                    <h5 class="fw-bold mb-4"><i class="bi bi-bullseye me-2"></i>Goal Setting</h5>
+                    <div class="mb-4">
+                        <div class="small fw-bold mb-1">Fat Loss Target</div>
+                        <div class="progress bg-white bg-opacity-25" style="height: 8px;">
+                            <div class="progress-bar bg-white" style="width: 65%"></div>
                         </div>
+                        <div class="text-end small mt-1 opacity-75">65% Achieved</div>
                     </div>
-                    <div class="small d-flex flex-column gap-3 mt-auto">
-                        <div class="d-flex justify-content-between align-items-center p-3 rounded-4 bg-light bg-opacity-10 border border-white border-opacity-10">
-                            <span class="d-flex align-items-center"><i class="bi bi-circle-fill text-primary me-3" style="font-size: 0.6rem;"></i>Protein</span>
-                            <span class="fw-bold">@p.ToString("F0")% <span class="text-muted fw-normal ms-1">(@report.Protein.ToString("F0")g)</span></span>
+                    <div class="mb-4">
+                        <div class="small fw-bold mb-1">Muscle Gain</div>
+                        <div class="progress bg-white bg-opacity-25" style="height: 8px;">
+                            <div class="progress-bar bg-white" style="width: 40%"></div>
                         </div>
-                        <div class="d-flex justify-content-between align-items-center p-3 rounded-4 bg-light bg-opacity-10 border border-white border-opacity-10">
-                            <span class="d-flex align-items-center"><i class="bi bi-circle-fill text-success me-3" style="font-size: 0.6rem;"></i>Carbs</span>
-                            <span class="fw-bold">@c.ToString("F0")% <span class="text-muted fw-normal ms-1">(@report.Carbs.ToString("F0")g)</span></span>
-                        </div>
-                        <div class="d-flex justify-content-between align-items-center p-3 rounded-4 bg-light bg-opacity-10 border border-white border-opacity-10">
-                            <span class="d-flex align-items-center"><i class="bi bi-circle-fill text-danger me-3" style="font-size: 0.6rem;"></i>Fats</span>
-                            <span class="fw-bold">@f.ToString("F0")% <span class="text-muted fw-normal ms-1">(@report.Fat.ToString("F0")g)</span></span>
+                        <div class="text-end small mt-1 opacity-75">40% Achieved</div>
+                    </div>
+                    <div class="mt-auto">
+                        <div class="p-3 bg-white bg-opacity-10 rounded-3">
+                            <h6 class="fw-bold mb-1"><i class="bi bi-bell-fill me-2"></i>Reminder</h6>
+                            <p class="small mb-0 opacity-75">Don't forget your post-workout Creatine shake in 30 mins.</p>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+    }
+    else if (Session.CurrentUser?.Pathway == "Diet")
+    {
+        <!-- Diet-Focused Users Theme (Green) -->
+        <div class="row g-4 mb-5">
+            <div class="col-md-3">
+                <a href="calorie-intake" class="text-decoration-none text-dark d-block">
+                    <div class="card p-4 border-0 shadow-sm hover-up border-bottom border-success border-3">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <div class="text-muted small fw-bold mb-2 text-uppercase ls-wide">Calorie Intake</div>
+                                <div class="h2 fw-bold mb-1">@report.TotalCalories.ToString("N0") <span class="h6 text-muted fw-normal">kcal</span></div>
+                                <div class="growth-indicator text-success"><i class="bi bi-check-circle me-1"></i> In limit</div>
+                            </div>
+                            <div class="stat-card-icon bg-success bg-opacity-10 text-success rounded-4 shadow-sm" style="width: 56px; height: 56px;">
+                                <i class="bi bi-apple fs-4"></i>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <div class="col-md-3">
+                <a href="protein" class="text-decoration-none text-dark d-block">
+                    <div class="card p-4 border-0 shadow-sm hover-up border-bottom border-success border-3">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <div class="text-muted small fw-bold mb-2 text-uppercase ls-wide">Protein</div>
+                                <div class="h2 fw-bold mb-1">@report.Protein.ToString("F0") <span class="h6 text-muted fw-normal">g</span></div>
+                                <div class="growth-indicator text-success"><i class="bi bi-graph-up-arrow me-1"></i> On target</div>
+                            </div>
+                            <div class="stat-card-icon bg-success bg-opacity-10 text-success rounded-4 shadow-sm" style="width: 56px; height: 56px;">
+                                <i class="bi bi-egg-fried fs-4"></i>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <div class="col-md-3">
+                <a href="weight" class="text-decoration-none text-dark d-block">
+                    <div class="card p-4 border-0 shadow-sm hover-up border-bottom border-success border-3">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <div class="text-muted small fw-bold mb-2 text-uppercase ls-wide">Weight</div>
+                                <div class="h2 fw-bold mb-1">162.4 <span class="h6 text-muted fw-normal">lbs</span></div>
+                                <div class="growth-indicator text-success"><i class="bi bi-arrow-down-right me-1"></i> -1.2 lbs</div>
+                            </div>
+                            <div class="stat-card-icon bg-success bg-opacity-10 text-success rounded-4 shadow-sm" style="width: 56px; height: 56px;">
+                                <i class="bi bi-speedometer fs-4"></i>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <div class="col-md-3">
+                <a href="nutrient-score" class="text-decoration-none text-dark d-block">
+                    <div class="card p-4 border-0 shadow-sm hover-up border-bottom border-success border-3">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <div class="text-muted small fw-bold mb-2 text-uppercase ls-wide">Nutrient Score</div>
+                                <div class="h2 fw-bold mb-1">A- <span class="h6 text-muted fw-normal">Grade</span></div>
+                                <div class="growth-indicator text-warning"><i class="bi bi-exclamation-triangle me-1"></i> Low Iron</div>
+                            </div>
+                            <div class="stat-card-icon bg-success bg-opacity-10 text-success rounded-4 shadow-sm" style="width: 56px; height: 56px;">
+                                <i class="bi bi-clipboard2-pulse fs-4"></i>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
 
-        <!-- Bottom Data Row -->
         <div class="row g-4 mb-4">
-            <div class="col-lg-4">
+            <div class="col-lg-8">
                 <div class="card border-0 p-4 h-100">
-                    <h6 class="fw-bold mb-3">Daily Goals Progress</h6>
-                    <div class="mb-4">
-                        <div class="d-flex justify-content-between mb-1 small">
-                            <span>Calorie Limit</span>
-                            <span class="fw-bold">78%</span>
-                        </div>
-                        <div class="progress" style="height: 6px;">
-                            <div class="progress-bar bg-primary" style="width: 78%"></div>
+                    <div class="d-flex justify-content-between mb-4">
+                        <h5 class="fw-bold m-0 text-success">Diet Plan Progress (Keto)</h5>
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-light border">Macro Tracking <i class="bi bi-chevron-down ms-1"></i></button>
                         </div>
                     </div>
-                    <div class="mb-4">
-                        <div class="d-flex justify-content-between mb-1 small">
-                            <span>Protein Target</span>
-                            <span class="fw-bold">52%</span>
-                        </div>
-                        <div class="progress" style="height: 6px;">
-                            <div class="progress-bar bg-success" style="width: 52%"></div>
-                        </div>
-                    </div>
-                    <div class="mb-4">
-                        <div class="d-flex justify-content-between mb-1 small">
-                            <span>Water Intake</span>
-                            <span class="fw-bold">66%</span>
-                        </div>
-                        <div class="progress" style="height: 6px;">
-                            <div class="progress-bar bg-info" style="width: 66%"></div>
-                        </div>
+                    <div class="chart-container-large position-relative">
+                        <svg width="100%" height="100%" viewBox="0 0 800 300" preserveAspectRatio="none">
+                            <defs>
+                                <linearGradient id="dietGradient" x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="5%" stop-color="#198754" stop-opacity="0.3"/>
+                                    <stop offset="95%" stop-color="#198754" stop-opacity="0"/>
+                                </linearGradient>
+                            </defs>
+                            @for (int i = 0; i <= 4; i++) { <line x1="0" y1="@(i * 75)" x2="800" y2="@(i * 75)" stroke="#f0f0f0" stroke-width="1" /> }
+                            <path class="area-path" d="M0,300 L0,180 C100,200 200,150 300,140 C400,170 500,120 600,130 C700,100 800,90 800,90 L800,300 Z" style="fill: url(#dietGradient);" />
+                            <path class="line-path" d="M0,180 C100,200 200,150 300,140 C400,170 500,120 600,130 C700,100 800,90 800,90" stroke="#198754" stroke-width="3" fill="none"/>
+                            <circle cx="200" cy="150" r="5" fill="#fff" stroke="#198754" stroke-width="2" />
+                            <circle cx="500" cy="120" r="5" fill="#fff" stroke="#198754" stroke-width="2" />
+                        </svg>
                     </div>
                 </div>
             </div>
             <div class="col-lg-4">
-                <div class="card border-0 p-4 h-100">
-                    <div class="d-flex justify-content-between mb-3 align-items-center">
-                        <h6 class="fw-bold mb-0">Recent Meals</h6>
-                        <a href="meals" class="small text-primary text-decoration-none">View all</a>
+                <div class="card border-0 p-4 h-100 bg-success text-white hover-up shadow">
+                    <h5 class="fw-bold mb-4"><i class="bi bi-lightbulb me-2"></i>Nutrient Insights</h5>
+                    <div class="p-3 bg-white bg-opacity-10 rounded-3 mb-3">
+                        <h6 class="fw-bold mb-1">Deficiency Detected</h6>
+                        <p class="small mb-0 opacity-75">Your Vitamin D intake is below target for the week.</p>
                     </div>
-                    <div class="activity-list mt-2">
-                        @foreach (var meal in recentMealsList.Take(4))
-                        {
-                            <div class="d-flex align-items-center gap-3 py-2 border-bottom border-light">
-                                <div class="bg-light p-2 rounded">
-                                    <i class="bi bi-egg text-primary"></i>
-                                </div>
-                                <div class="flex-grow-1">
-                                    <div class="small fw-bold">@meal.Name</div>
-                                    <div class="text-muted" style="font-size: 0.75rem;">@Session.ToLocalTime(meal.LoggedAt).ToShortTimeString()</div>
-                                </div>
-                                <div class="small fw-bold text-success">+@meal.Calories</div>
+                    <div class="p-3 bg-white bg-opacity-10 rounded-3 mb-4">
+                        <h6 class="fw-bold mb-1">Recipe Suggestion</h6>
+                        <p class="small mb-2 opacity-75">Spinach & Salmon Salad</p>
+                        <button class="btn btn-sm btn-light text-success fw-bold">View Recipe</button>
+                    </div>
+                    <div class="mt-auto text-center border-top border-white border-opacity-25 pt-3">
+                        <a href="shoppinglist" class="text-white text-decoration-none fw-bold small"><i class="bi bi-cart me-2"></i>Generate Grocery List</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <!-- General Consumers Theme (Blue/Purple) -->
+        <div class="row g-4 mb-5">
+            <div class="col-md-3">
+                <a href="steps" class="text-decoration-none text-dark d-block">
+                    <div class="card p-4 border-0 shadow-sm hover-up border-bottom border-primary border-3">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <div class="text-muted small fw-bold mb-2 text-uppercase ls-wide">Daily Steps</div>
+                                <div class="h2 fw-bold mb-1">7,432 <span class="h6 text-muted fw-normal">steps</span></div>
+                                <div class="growth-indicator text-success"><i class="bi bi-arrow-up-right me-1"></i> Target: 10k</div>
                             </div>
-                        }
+                            <div class="stat-card-icon bg-primary bg-opacity-10 text-primary rounded-4 shadow-sm" style="width: 56px; height: 56px;">
+                                <i class="bi bi-person-walking fs-4"></i>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <div class="col-md-3">
+                <a href="water" class="text-decoration-none text-dark d-block">
+                    <div class="card p-4 border-0 shadow-sm hover-up border-bottom border-primary border-3">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <div class="text-muted small fw-bold mb-2 text-uppercase ls-wide">Hydration</div>
+                                <div class="h2 fw-bold mb-1">@totalWater.ToString("F1") <span class="h6 text-muted fw-normal">L</span></div>
+                                <div class="growth-indicator text-primary"><i class="bi bi-droplet-half me-1"></i> Good</div>
+                            </div>
+                            <div class="stat-card-icon bg-primary bg-opacity-10 text-primary rounded-4 shadow-sm" style="width: 56px; height: 56px;">
+                                <i class="bi bi-droplet fs-4"></i>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <div class="col-md-3">
+                <a href="sleep" class="text-decoration-none text-dark d-block">
+                    <div class="card p-4 border-0 shadow-sm hover-up border-bottom border-primary border-3">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <div class="text-muted small fw-bold mb-2 text-uppercase ls-wide">Sleep Score</div>
+                                <div class="h2 fw-bold mb-1">7.5 <span class="h6 text-muted fw-normal">hrs</span></div>
+                                <div class="growth-indicator text-success"><i class="bi bi-moon-stars me-1"></i> Rested</div>
+                            </div>
+                            <div class="stat-card-icon bg-primary bg-opacity-10 text-primary rounded-4 shadow-sm" style="width: 56px; height: 56px;">
+                                <i class="bi bi-moon fs-4"></i>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <div class="col-md-3">
+                <a href="habits" class="text-decoration-none text-dark d-block">
+                    <div class="card p-4 border-0 shadow-sm hover-up border-bottom border-primary border-3">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <div class="text-muted small fw-bold mb-2 text-uppercase ls-wide">Mood Logs</div>
+                                <div class="h2 fw-bold mb-1">Happy</div>
+                                <div class="growth-indicator text-primary"><i class="bi bi-emoji-smile me-1"></i> Great day</div>
+                            </div>
+                            <div class="stat-card-icon bg-primary bg-opacity-10 text-primary rounded-4 shadow-sm" style="width: 56px; height: 56px;">
+                                <i class="bi bi-emoji-smile fs-4"></i>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        <div class="row g-4 mb-4">
+            <div class="col-lg-8">
+                <div class="card border-0 p-4 h-100">
+                    <div class="d-flex justify-content-between mb-4">
+                        <h5 class="fw-bold m-0 text-primary">Wellness Habits Overview</h5>
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-light border">This Week <i class="bi bi-chevron-down ms-1"></i></button>
+                        </div>
+                    </div>
+                    <div class="chart-container-large position-relative">
+                        <svg width="100%" height="100%" viewBox="0 0 800 300" preserveAspectRatio="none">
+                            <defs>
+                                <linearGradient id="generalGradient" x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="5%" stop-color="#0d6efd" stop-opacity="0.3"/>
+                                    <stop offset="95%" stop-color="#0d6efd" stop-opacity="0"/>
+                                </linearGradient>
+                            </defs>
+                            @for (int i = 0; i <= 4; i++) { <line x1="0" y1="@(i * 75)" x2="800" y2="@(i * 75)" stroke="#f0f0f0" stroke-width="1" /> }
+                            <path class="area-path" d="M0,300 L0,220 C100,200 200,280 300,190 C400,200 500,160 600,120 C700,100 800,110 800,110 L800,300 Z" style="fill: url(#generalGradient);" />
+                            <path class="line-path" d="M0,220 C100,200 200,280 300,190 C400,200 500,160 600,120 C700,100 800,110 800,110" stroke="#0d6efd" stroke-width="3" fill="none"/>
+                            <circle cx="300" cy="190" r="5" fill="#fff" stroke="#0d6efd" stroke-width="2" />
+                            <circle cx="600" cy="120" r="5" fill="#fff" stroke="#0d6efd" stroke-width="2" />
+                        </svg>
                     </div>
                 </div>
             </div>
             <div class="col-lg-4">
-                <div class="card border-0 p-4 h-100">
-                    <h6 class="fw-bold mb-3">Recent Activity</h6>
-                    <div class="activity-list small">
-                        <div class="activity-item">
-                            <div class="activity-icon bg-success bg-opacity-10 text-success"><i class="bi bi-check-lg"></i></div>
-                            <div>
-                                <div class="fw-bold">Goal Acheived</div>
-                                <div class="text-muted">Reached daily water target.</div>
-                            </div>
-                            <div class="ms-auto text-muted" style="font-size: 0.7rem;">2m</div>
+                <div class="card border-0 p-4 h-100 bg-primary text-white hover-up shadow" style="background-image: linear-gradient(135deg, #0d6efd 0%, #6f42c1 100%);">
+                    <h5 class="fw-bold mb-4"><i class="bi bi-star-fill me-2"></i>Habit Builder</h5>
+                    <div class="d-flex align-items-center justify-content-between p-3 bg-white bg-opacity-10 rounded-3 mb-2">
+                        <span><i class="bi bi-check-circle-fill text-success me-2"></i> 10m Meditation</span>
+                        <span class="badge bg-white text-primary">Streak: 5</span>
+                    </div>
+                    <div class="d-flex align-items-center justify-content-between p-3 bg-white bg-opacity-10 rounded-3 mb-4">
+                        <span><i class="bi bi-circle me-2"></i> Evening Walk</span>
+                        <span class="badge bg-white text-primary">Pending</span>
+                    </div>
+
+                    <div class="mt-auto">
+                        <div class="text-center p-3 rounded-3" style="background: rgba(0,0,0,0.15);">
+                            <h6 class="fw-bold mb-1">Motivational Insight</h6>
+                            <p class="small mb-0 font-italic">"Small daily improvements are the key to staggering long-term results."</p>
                         </div>
-                        <div class="activity-item">
-                            <div class="activity-icon bg-primary bg-opacity-10 text-primary"><i class="bi bi-journal-plus"></i></div>
-                            <div>
-                                <div class="fw-bold">Meal Logged</div>
-                                <div class="text-muted">Chicken Salad (450 kcal)</div>
-                            </div>
-                            <div class="ms-auto text-muted" style="font-size: 0.7rem;">15m</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- Below we keep Quick Actions for all views but they have already been tailored in the prior task -->
+    @if (report != null && goal != null)
+    {
+        <!-- Proactive UX Features: Predictive Insights & Push Notifications -->
+        <div class="row g-4 mb-4">
+            <div class="col-12">
+                <div class="card border-0 p-4 shadow-sm" style="background: linear-gradient(to right, #f8f9fa, #e9ecef);">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="fw-bold mb-0 text-dark">
+                            <i class="bi bi-robot text-primary me-2"></i>Proactive Analytics & Reminders
+                        </h5>
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-sm btn-outline-primary bg-white shadow-sm" @onclick="EnableNotifications" disabled="@isNotificationsEnabled">
+                                <i class="bi bi-bell me-1"></i> @(isNotificationsEnabled ? "Reminders On" : "Enable Reminders")
+                            </button>
+                            <button class="btn btn-sm btn-primary shadow-sm" @onclick="LoadPredictiveInsights" disabled="@isLoadingInsights">
+                                @if (isLoadingInsights) { <span class="spinner-border spinner-border-sm me-1"></span> }
+                                <i class="bi bi-magic me-1" style="display:@(isLoadingInsights ? "none" : "inline-block")"></i> Analyze Habits
+                            </button>
                         </div>
-                        <div class="activity-item">
-                            <div class="activity-icon bg-warning bg-opacity-10 text-warning"><i class="bi bi-star"></i></div>
-                            <div>
-                                <div class="fw-bold">New Record</div>
-                                <div class="text-muted">Highest protein day this month.</div>
-                            </div>
-                            <div class="ms-auto text-muted" style="font-size: 0.7rem;">1h</div>
+                    </div>
+
+                    @if (!string.IsNullOrEmpty(predictiveInsight))
+                    {
+                        <div class="p-3 bg-white border-start border-primary border-4 rounded-3 shadow-sm mb-3">
+                            <i class="bi bi-lightbulb-fill text-warning me-2"></i><strong>Smart Insight:</strong> @predictiveInsight
                         </div>
-                        <div class="text-center mt-3">
-                            <a href="#" class="small text-primary text-decoration-none">View all activity</a>
+                    }
+                    else
+                    {
+                        <div class="p-3 bg-white text-muted rounded-3 shadow-sm mb-3 small d-flex align-items-center">
+                            <i class="bi bi-info-circle me-2 fs-5"></i> Click 'Analyze Habits' to generate a predictive AI health suggestion based on your recent data.
                         </div>
+                    }
+
+                    <div class="d-flex align-items-center gap-2 mt-2">
+                        <button class="btn btn-sm btn-dark" @onclick="ScheduleTestReminder"><i class="bi bi-stopwatch me-1"></i> Test Push Reminder (5s)</button>
                     </div>
                 </div>
             </div>
@@ -313,30 +491,27 @@
 
         <!-- Quick Actions -->
         <div class="row g-4 mb-4">
-            <div class="col-md-3 col-6">
-                <button class="quick-action-btn shadow-sm">
-                    <div class="bg-primary bg-opacity-10 text-primary p-2 rounded-circle"><i class="bi bi-plus-circle"></i></div>
-                    <div class="small fw-bold">New Meal</div>
-                </button>
-            </div>
-            <div class="col-md-3 col-6">
-                <button class="quick-action-btn shadow-sm">
-                    <div class="bg-info bg-opacity-10 text-info p-2 rounded-circle"><i class="bi bi-droplet"></i></div>
-                    <div class="small fw-bold">Log Water</div>
-                </button>
-            </div>
-            <div class="col-md-3 col-6">
-                <button class="quick-action-btn shadow-sm">
-                    <div class="bg-success bg-opacity-10 text-success p-2 rounded-circle"><i class="bi bi-cart"></i></div>
-                    <div class="small fw-bold">Shopping</div>
-                </button>
-            </div>
-            <div class="col-md-3 col-6">
-                <button class="quick-action-btn shadow-sm">
-                    <div class="bg-secondary bg-opacity-10 text-secondary p-2 rounded-circle"><i class="bi bi-file-earmark-text"></i></div>
-                    <div class="small fw-bold">Reports</div>
-                </button>
-            </div>
+            @if(Session.CurrentUser?.Pathway == "Gym")
+            {
+                <div class="col-md-3 col-6"><button class="quick-action-btn shadow-sm"><div class="bg-danger bg-opacity-10 text-danger p-2 rounded-circle"><i class="bi bi-fire"></i></div><div class="small fw-bold">Log Workout</div></button></div>
+                <div class="col-md-3 col-6"><button class="quick-action-btn shadow-sm"><div class="bg-warning bg-opacity-10 text-warning p-2 rounded-circle"><i class="bi bi-capsule"></i></div><div class="small fw-bold">Supplements</div></button></div>
+                <div class="col-md-3 col-6"><button class="quick-action-btn shadow-sm"><div class="bg-info bg-opacity-10 text-info p-2 rounded-circle"><i class="bi bi-activity"></i></div><div class="small fw-bold">Recovery</div></button></div>
+                <div class="col-md-3 col-6"><button class="quick-action-btn shadow-sm"><div class="bg-secondary bg-opacity-10 text-secondary p-2 rounded-circle"><i class="bi bi-play-circle"></i></div><div class="small fw-bold">Videos</div></button></div>
+            }
+            else if(Session.CurrentUser?.Pathway == "Diet")
+            {
+                <div class="col-md-3 col-6"><button class="quick-action-btn shadow-sm"><div class="bg-success bg-opacity-10 text-success p-2 rounded-circle"><i class="bi bi-journal-plus"></i></div><div class="small fw-bold">Log Meal</div></button></div>
+                <div class="col-md-3 col-6"><button class="quick-action-btn shadow-sm"><div class="bg-primary bg-opacity-10 text-primary p-2 rounded-circle"><i class="bi bi-list-check"></i></div><div class="small fw-bold">New Plan</div></button></div>
+                <div class="col-md-3 col-6"><button class="quick-action-btn shadow-sm"><div class="bg-warning bg-opacity-10 text-warning p-2 rounded-circle"><i class="bi bi-cart"></i></div><div class="small fw-bold">Groceries</div></button></div>
+                <div class="col-md-3 col-6"><button class="quick-action-btn shadow-sm"><div class="bg-secondary bg-opacity-10 text-secondary p-2 rounded-circle"><i class="bi bi-magic"></i></div><div class="small fw-bold">Expert Tips</div></button></div>
+            }
+            else
+            {
+                <div class="col-md-3 col-6"><button class="quick-action-btn shadow-sm"><div class="bg-primary bg-opacity-10 text-primary p-2 rounded-circle"><i class="bi bi-trophy"></i></div><div class="small fw-bold">Habit Builder</div></button></div>
+                <div class="col-md-3 col-6"><button class="quick-action-btn shadow-sm"><div class="bg-info bg-opacity-10 text-info p-2 rounded-circle"><i class="bi bi-droplet"></i></div><div class="small fw-bold">Hydration</div></button></div>
+                <div class="col-md-3 col-6"><button class="quick-action-btn shadow-sm"><div class="bg-success bg-opacity-10 text-success p-2 rounded-circle"><i class="bi bi-calendar-check"></i></div><div class="small fw-bold">Planner</div></button></div>
+                <div class="col-md-3 col-6"><button class="quick-action-btn shadow-sm"><div class="bg-warning bg-opacity-10 text-warning p-2 rounded-circle"><i class="bi bi-star"></i></div><div class="small fw-bold">Earn Badges</div></button></div>
+            }
         </div>
     }
 </ConsumerOnly>
@@ -347,6 +522,84 @@
     private double totalWater;
     private List<Meal> recentMealsList = new();
     private bool showShareOptions = false;
+
+    private string predictiveInsight = "";
+    private bool isLoadingInsights = false;
+    private bool isNotificationsEnabled = false;
+
+    private async Task EnableNotifications()
+    {
+        var status = await JS.InvokeAsync<string>("requestNotificationPermission");
+        if (status == "granted")
+        {
+            isNotificationsEnabled = true;
+            await JS.InvokeVoidAsync("showNotification", "Welcome to SmartBite Reminders!", new { body = "We'll ping you when it's time to log a meal or drink water." });
+        }
+        else
+        {
+            await JS.InvokeVoidAsync("alert", "Notification permissions were not granted.");
+        }
+    }
+
+    private async Task ScheduleTestReminder()
+    {
+        if (!isNotificationsEnabled)
+        {
+            await JS.InvokeVoidAsync("alert", "Please enable reminders first.");
+            return;
+        }
+
+        _ = Task.Delay(5000).ContinueWith(async _ =>
+        {
+            await InvokeAsync(async () =>
+            {
+                await JS.InvokeVoidAsync("showNotification", "Hydration Reminder!", new { body = "It's been a while since your last log. Time to drink a glass of water!" });
+            });
+        });
+    }
+
+    private async Task LoadPredictiveInsights()
+    {
+        if (report == null || recentMealsList == null) return;
+
+        var chatClient = Provider.GetService<ChatClient>();
+        if (chatClient == null)
+        {
+            await JS.InvokeVoidAsync("alert", "AI ChatClient not configured. Please add GitHubToken to user secrets.");
+            return;
+        }
+
+        isLoadingInsights = true;
+        StateHasChanged();
+        try
+        {
+            var mealSummaries = string.Join("\n", recentMealsList.Take(5).Select(m => $"- {m.Name}: {m.Calories} kcal"));
+            var prompt = $$"""
+                You are a predictive health analytics engine. Analyze the user's data context:
+                Daily Total Calories: {{report.TotalCalories}}
+                Protein: {{report.Protein}}g, Carbs: {{report.Carbs}}g
+                Recent Meals Logged:
+                {{mealSummaries}}
+
+                Predict a trend or habit, and provide ONE single sentence of proactive, customized advice. Examples: 
+                - "You usually miss your protein goal on workout days; prep a shake tonight."
+                - "Your dinners are heavy in carbs; balance them with healthy fats."
+                Wait, output ONLY the single sentence insight. No conversational intro.
+                """;
+
+            var response = await chatClient.CompleteChatAsync(prompt);
+            predictiveInsight = response.Value.Content[0].Text?.Trim() ?? "Keep up the great work!";
+        }
+        catch (Exception)
+        {
+            predictiveInsight = "Unable to analyze patterns at this time. Log more data.";
+        }
+        finally
+        {
+            isLoadingInsights = false;
+            StateHasChanged();
+        }
+    }
 
     protected override async Task OnInitializedAsync()
     {

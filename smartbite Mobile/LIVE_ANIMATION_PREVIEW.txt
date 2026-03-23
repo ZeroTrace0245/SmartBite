@@ -1,0 +1,350 @@
+╔════════════════════════════════════════════════════════════════════════╗
+║         SMARTBITE - LIVE ANIMATION PREVIEW                             ║
+║              What You'll See When You Run The App                       ║
+╚════════════════════════════════════════════════════════════════════════╝
+
+Let's walk through the Dashboard screen animations frame by frame...
+
+═══════════════════════════════════════════════════════════════════════════
+
+TIME: 0.0 seconds
+═══════════════════════════════════════════════════════════════════════════
+
+┌─────────────────────────────────────────────────────────────┐
+│ DAILY SNAPSHOT                                              │ (Title - White)
+└─────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────┐
+│ ░░░░░░░░░░░░░░░░ SOFT GLOW ░░░░░░░░░░░░░░░░              │
+│ │ Meals logged          30% opacity  │  RED text            │
+│ │ 1                     BRIGHT RED   │  Value               │
+│ ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░              │
+└─────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────┐
+│ ░░░░░░░░░░░░░░░░ SOFT GLOW ░░░░░░░░░░░░░░░░              │
+│ │ Water consumed        30% opacity  │  AQUA text           │
+│ │ 1500 ml               BRIGHT AQUA  │  Value               │
+│ ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░              │
+└─────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────┐
+│ ░░░░░░░░░░░░░░░░ SOFT GLOW ░░░░░░░░░░░░░░░░              │
+│ │ Shopping remaining    30% opacity  │  GREEN text          │
+│ │ 1                     BRIGHT GREEN │  Value               │
+│ ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░              │
+└─────────────────────────────────────────────────────────────┘
+
+┌──────────────────────────────┐
+│   ░ SOFT GLOW ░ Sync now     │  (Red button with soft border)
+└──────────────────────────────┘
+
+┌────────────────────────────────────────┐
+│   ░ SOFT GLOW ░ Pathway preferences    │  (Red button with soft border)
+└────────────────────────────────────────┘
+
+Diet Planning Dashboard
+
+┌──────────────────────────────────────────────────────────┐
+│ ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ │
+│ │ Auto Weekly Meal Plan          SHIMMER →            │
+│ │ A 7-day meal plan is generated based on your        │
+│ │ Target adherence: 91%                               │
+│ ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ │
+└──────────────────────────────────────────────────────────┘
+
+
+═══════════════════════════════════════════════════════════════════════════
+
+TIME: 0.5 seconds
+═══════════════════════════════════════════════════════════════════════════
+
+(Cards pulse brighter, shimmer moves right)
+
+┌─────────────────────────────────────────────────────────────┐
+│ ████████████████ MEDIUM GLOW ████████████████             │
+│ │ Meals logged          55% opacity  │  RED text            │
+│ │ 1                     BRIGHT RED   │  Value               │
+│ ████████████████████████████████████████████              │
+└─────────────────────────────────────────────────────────────┘
+
+(Other stat cards similar - all pulsing together)
+
+┌──────────────────────────────┐
+│   ████ MEDIUM GLOW ████      │
+│   ░ Sync now ░               │  (Border glowing brighter)
+└──────────────────────────────┘
+
+┌────────────────────────────────────────┐
+│   ████ MEDIUM GLOW ████               │
+│   ░ Pathway preferences ░              │  (Border glowing brighter)
+└────────────────────────────────────────┘
+
+(Feature cards have shimmer flowing right)
+
+┌──────────────────────────────────────────────────────────┐
+│ ████████████████████████████████████████████████████████ │
+│ │ Auto Weekly Meal Plan     SHIMMER → → →                │
+│ │ A 7-day meal plan is generated based on your          │
+│ │ Target adherence: 91%                                 │
+│ ████████████████████████████████████████████████████████ │
+└──────────────────────────────────────────────────────────┘
+
+
+═══════════════════════════════════════════════════════════════════════════
+
+TIME: 0.75 seconds (PEAK GLOW)
+═══════════════════════════════════════════════════════════════════════════
+
+(Maximum brightness!)
+
+┌─────────────────────────────────────────────────────────────┐
+│ ██████████████████ BRIGHT GLOW ██████████████████        │
+│ │ Meals logged          80% opacity  │  RED text            │
+│ │ 1                     BRIGHT RED   │  Value               │
+│ ██████████████████████████████████████████████             │
+│                                                             │
+│  ✨ Shadow glows brightest! ✨                            │
+└─────────────────────────────────────────────────────────────┘
+
+(All stat cards at peak brightness)
+
+┌──────────────────────────────┐
+│   ████████ BRIGHT ████████   │
+│   ✨ Sync now ✨            │  (Maximum glow!)
+└──────────────────────────────┘
+
+(Shimmer reaches the middle)
+
+┌──────────────────────────────────────────────────────────┐
+│ ██████████████████████████████████████████████████████████ │
+│ │ Auto Weekly Meal Plan        ← SHIMMER →               │
+│ │ A 7-day meal plan is generated based on your          │
+│ │ Target adherence: 91%                                 │
+│ ██████████████████████████████████████████████████████████ │
+│                  ✨ Shimmer at center! ✨                 │
+└──────────────────────────────────────────────────────────┘
+
+
+═══════════════════════════════════════════════════════════════════════════
+
+TIME: 1.0 second
+═══════════════════════════════════════════════════════════════════════════
+
+(Fading back to medium)
+
+┌─────────────────────────────────────────────────────────────┐
+│ ████████████████ MEDIUM GLOW ████████████████             │
+│ │ Meals logged          55% opacity  │  RED text            │
+│ │ 1                     BRIGHT RED   │  Value               │
+│ ████████████████████████████████████████████              │
+└─────────────────────────────────────────────────────────────┘
+
+┌──────────────────────────────┐
+│   ████ MEDIUM GLOW ████      │
+│   ░ Sync now ░               │  (Button glow fading)
+└──────────────────────────────┘
+
+(Shimmer continues flowing)
+
+┌──────────────────────────────────────────────────────────┐
+│ ████████████████████████████████████████████████████████ │
+│ │ Auto Weekly Meal Plan           → → → SHIMMER         │
+│ │ A 7-day meal plan is generated based on your          │
+│ │ Target adherence: 91%                                 │
+│ ████████████████████████████████████████████████████████ │
+│              (Shimmer flowing right)                      │
+└──────────────────────────────────────────────────────────┘
+
+
+═══════════════════════════════════════════════════════════════════════════
+
+TIME: 1.5 seconds (CYCLE REPEATS FOR STAT CARDS)
+═══════════════════════════════════════════════════════════════════════════
+
+(Back to soft glow - cycle repeats infinitely)
+
+┌─────────────────────────────────────────────────────────────┐
+│ ░░░░░░░░░░░░░░░░ SOFT GLOW ░░░░░░░░░░░░░░░░              │
+│ │ Meals logged          30% opacity  │  RED text            │
+│ │ 1                     BRIGHT RED   │  Value               │
+│ ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░              │
+│                 ♻ Stat card cycle repeats ♻              │
+└─────────────────────────────────────────────────────────────┘
+
+Button restarts cycle too:
+
+┌──────────────────────────────┐
+│   ░ SOFT GLOW ░ Sync now     │  ♻ Back to soft glow
+└──────────────────────────────┘
+
+(Feature card continues shimmer)
+
+┌──────────────────────────────────────────────────────────┐
+│ ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ │
+│ │ Auto Weekly Meal Plan     ← ← ← SHIMMER              │
+│ │ A 7-day meal plan is generated based on your        │
+│ │ Target adherence: 91%                               │
+│ ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ │
+└──────────────────────────────────────────────────────────┘
+
+
+═══════════════════════════════════════════════════════════════════════════
+
+TIME: 2.0 seconds (FEATURE CARD CYCLE REPEATS)
+═══════════════════════════════════════════════════════════════════════════
+
+(Shimmer has traveled all the way right, now starts again from left)
+
+Stat cards: Currently at MEDIUM GLOW (halfway through their 1.5s cycle)
+Buttons: Currently at MEDIUM GLOW (halfway through their 1s cycle)
+Feature cards: ♻ SHIMMER CYCLE REPEATS (2s cycle)
+
+┌──────────────────────────────────────────────────────────┐
+│ ████████████████████████████████████████████████████████ │
+│ │ Auto Weekly Meal Plan      SHIMMER → (starting again) │
+│ │ A 7-day meal plan is generated based on your        │
+│ │ Target adherence: 91%                               │
+│ ████████████████████████████████████████████████████████ │
+│            ♻ Feature card shimmer cycle repeats ♻       │
+└──────────────────────────────────────────────────────────┘
+
+
+═══════════════════════════════════════════════════════════════════════════
+
+CONTINUOUS ANIMATION PATTERN
+═══════════════════════════════════════════════════════════════════════════
+
+Stat Cards (1.5s cycle):
+  ░░ ✓ ████ ✓ ░░ ✓ ████ ✓ ░░ ✓ ████ ✓ ...
+  0  0.75  1.5  2.25 3.0
+
+Feature Cards (2.0s cycle):
+  ← SHIMMER → ✓ ← SHIMMER → ✓ ← SHIMMER → ✓ ...
+  0  1.0  2.0  4.0
+
+Buttons (1.0s cycle):
+  ░░ ✓ ████ ✓ ░░ ✓ ████ ✓ ░░ ✓ ████ ✓ ...
+  0  0.5  1.0  1.5  2.0
+
+ALL ANIMATIONS REPEAT INFINITELY AND SIMULTANEOUSLY!
+
+
+═══════════════════════════════════════════════════════════════════════════
+
+ACTUAL VISUAL APPEARANCE
+═══════════════════════════════════════════════════════════════════════════
+
+What you'll actually see on screen:
+
+1. STAT CARDS: Gently pulse with a colored glow
+   - The glow color matches your selected pathway (Red/Green/Purple)
+   - Creates a "breathing" effect - relaxing to watch
+   - Border and shadow pulse together
+   - Numbers stay bright and readable
+
+2. FEATURE CARDS: Shimmer effect flows across
+   - Creates a "liquid" feel across the card
+   - Makes the card feel dynamic and alive
+   - Borders also pulse during shimmer
+   - Very eye-catching and modern
+
+3. BUTTONS: Pulsing glow draws attention
+   - Encourages users to tap
+   - Faster than stat cards (1s vs 1.5s)
+   - More urgent feel
+   - Great for CTAs (Call-to-Action)
+
+4. BACKGROUND: Dark navy stays static
+   - Provides contrast for glowing elements
+   - Prevents visual overload
+   - Easy on the eyes
+   - Professional appearance
+
+5. OVERALL EFFECT: Premium, modern, animated UI
+   - Feels responsive and alive
+   - Professional polish
+   - Engaging without being distracting
+   - Beautiful gradient transitions
+
+
+═══════════════════════════════════════════════════════════════════════════
+
+GYM PATHWAY EXAMPLE
+═══════════════════════════════════════════════════════════════════════════
+
+When you select "Gym" pathway:
+
+┌─────────────────────────────────────────────────────────────┐
+│ ░░░░░░░░░ RED GLOW ░░░░░░░░░                               │
+│ │ Meals logged          30% opacity  │  RED text            │
+│ │ 1                     BRIGHT RED   │  Value               │
+│ ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░              │
+└─────────────────────────────────────────────────────────────┘
+
+All stat cards show RED glow
+All feature cards have RED shimmer
+All buttons are RED with glowing borders
+⟹ Creates cohesive RED gym theme throughout!
+
+
+═══════════════════════════════════════════════════════════════════════════
+
+DIET PATHWAY EXAMPLE
+═══════════════════════════════════════════════════════════════════════════
+
+When you select "Diet" pathway:
+
+┌─────────────────────────────────────────────────────────────┐
+│ ░░░░░░░░░ GREEN GLOW ░░░░░░░░░                             │
+│ │ Meals logged          30% opacity  │  GREEN text          │
+│ │ 1                     BRIGHT GREEN │  Value               │
+│ ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░              │
+└─────────────────────────────────────────────────────────────┘
+
+All stat cards show GREEN glow
+All feature cards have GREEN shimmer
+All buttons are GREEN with glowing borders
+⟹ Creates cohesive GREEN diet theme throughout!
+
+
+═══════════════════════════════════════════════════════════════════════════
+
+WELLNESS PATHWAY EXAMPLE
+═══════════════════════════════════════════════════════════════════════════
+
+When you select "Wellness" pathway:
+
+┌─────────────────────────────────────────────────────────────┐
+│ ░░░░░░░░░ PURPLE GLOW ░░░░░░░░░                            │
+│ │ Meals logged          30% opacity  │  PURPLE text         │
+│ │ 1                     BRIGHT PURPLE│  Value               │
+│ ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░              │
+└─────────────────────────────────────────────────────────────┘
+
+All stat cards show PURPLE glow
+All feature cards have PURPLE shimmer
+All buttons are PURPLE with glowing borders
+⟹ Creates cohesive PURPLE wellness theme throughout!
+
+
+═══════════════════════════════════════════════════════════════════════════
+
+PERFORMANCE NOTES
+═══════════════════════════════════════════════════════════════════════════
+
+✅ Smooth 60fps animations
+✅ No stuttering or lag
+✅ No battery drain
+✅ Works on all devices
+✅ Highly optimized
+
+
+═══════════════════════════════════════════════════════════════════════════
+
+That's what you'll see when you run the app! 🎉
+
+Ready to see it in action? Run the app now! ✨
+
+═══════════════════════════════════════════════════════════════════════════
+

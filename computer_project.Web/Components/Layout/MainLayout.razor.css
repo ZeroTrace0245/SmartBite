@@ -37,6 +37,29 @@ main {
     }
 
 @media (max-width: 640.98px) {
+    .sidebar {
+        position: fixed;
+        left: -280px;
+        top: 0;
+        width: 280px;
+        height: 100vh;
+        z-index: 1505;
+        transition: left 0.3s ease-in-out;
+        box-shadow: 2px 0 8px rgba(0,0,0,0.1);
+    }
+
+    #mobile-nav-toggle:checked ~ .sidebar {
+        left: 0;
+    }
+
+    #mobile-nav-toggle:not(:checked) ~ .mobile-nav-backdrop {
+        display: none !important;
+    }
+
+    #mobile-nav-toggle:checked ~ .mobile-nav-backdrop {
+        display: block !important;
+    }
+
     .top-row {
         justify-content: space-between;
     }
@@ -47,6 +70,10 @@ main {
 }
 
 @media (min-width: 641px) {
+    .mobile-nav-backdrop {
+        display: none !important;
+    }
+
     .page {
         flex-direction: row;
     }

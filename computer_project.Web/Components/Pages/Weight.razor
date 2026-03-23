@@ -1,0 +1,44 @@
+@page "/weight"
+@using computer_project.Web.Services
+@inject UserSession Session
+@rendermode InteractiveServer
+
+<PageTitle>Weight Tracker - SmartBite</PageTitle>
+
+<div class="px-md-4 py-4">
+    <div class="d-flex justify-content-between align-items-end mb-4">
+        <div>
+            <div class="breadcrumb-small mb-1 text-uppercase ls-widest fw-bold opacity-75 text-success">Diet Focus</div>
+            <h1 class="display-6 fw-bold mb-0">Weight Analytics</h1>
+        </div>
+        <button class="btn btn-outline-success btn-sm shadow-sm px-4 py-2 rounded-3"><i class="bi bi-plus-lg me-2"></i>Log Weigh-in</button>
+    </div>
+
+    <div class="card p-4 border-0 shadow-sm border-bottom border-success border-3 mb-4">
+        <div class="d-flex justify-content-between align-items-start mb-4">
+            <div>
+                <div class="text-muted small fw-bold mb-1 text-uppercase ls-wide">Current Weight</div>
+                <div class="display-4 fw-bold text-dark">162.4 <span class="h5 text-muted fw-normal">lbs</span></div>
+                <div class="text-success small fw-bold mt-1"><i class="bi bi-arrow-down-right"></i> -1.2 lbs since last week</div>
+            </div>
+            <div class="text-end">
+                <div class="text-muted small fw-bold mb-1 text-uppercase ls-wide">Milestone</div>
+                <div class="h3 fw-bold text-dark mb-0">155.0 <span class="h6 text-muted fw-normal">lbs</span></div>
+            </div>
+        </div>
+
+        <div class="chart-container-large position-relative">
+            <svg width="100%" height="100%" viewBox="0 0 800 200" preserveAspectRatio="none">
+                <defs>
+                    <linearGradient id="weightGradient" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stop-color="#198754" stop-opacity="0.3"/>
+                        <stop offset="95%" stop-color="#198754" stop-opacity="0"/>
+                    </linearGradient>
+                </defs>
+                <path class="area-path" d="M0,200 L0,50 C100,60 200,40 300,70 C400,90 500,80 600,110 C700,130 800,150 800,150 L800,200 Z" style="fill: url(#weightGradient);" />
+                <path class="line-path" d="M0,50 C100,60 200,40 300,70 C400,90 500,80 600,110 C700,130 800,150 800,150" stroke="#198754" stroke-width="3" fill="none"/>
+                <circle cx="800" cy="150" r="5" fill="#fff" stroke="#198754" stroke-width="2" />
+            </svg>
+        </div>
+    </div>
+</div>

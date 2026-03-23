@@ -1,26 +1,43 @@
-# Contributing to SmartBite
+# Contributing to SmartBit
 
-> Contribution guide for the PUSL2021 Computing Group Project.
+> Contribution guide for the PUSL2021 Computing Group Project and open-source contributors.
 
-> ⚠️ **Requires .NET 10 SDK.** Earlier SDK versions are not supported.
+> ⚠️ **Requires .NET 10 or .NET 11 Preview SDK.** Earlier SDK versions are not supported.
 
 ---
 
 ## Getting Started
 
-### Installing .NET 10 SDK (Mandatory) — if already installed, skip this
+### Prerequisites
 
-To install the .NET 10 SDK using Windows Package Manager (winget), run the following command in your terminal:
+#### Required Software
+- .NET 10 SDK or .NET 11 Preview SDK
+- Visual Studio 2026 Insiders (recommended) or VS Code
+- Git
+
+#### Optional (for installer development)
+- WiX Toolset v3 (for MSI creation)
+- Inno Setup (alternative installer)
+- PowerShell 5.1 or later
+
+### Installing .NET SDK
+
+To install the .NET 11 SDK using Windows Package Manager (winget):
 
 ```sh
+winget install Microsoft.DotNet.SDK.Preview
 winget install Microsoft.DotNet.SDK.10
 ```
+
+Or download manually from [dotnet.microsoft.com](https://dotnet.microsoft.com/download/dotnet/11.0)
+
+### Development Setup
 
 1. Clone the repo and switch to a feature branch:
 
 ```sh
-git clone https://github.com/ZeroTrace0245/computer_project.git
-cd computer_project
+git clone https://github.com/ZeroTrace0245/SmartBit.git
+cd SmartBit
 git checkout -b feature/<your-area>
 ```
 
@@ -298,3 +315,230 @@ dotnet ef database update --project computer_project.ApiService
 | 8 | Feedback / contact | `Feedback.razor`, `SmartBiteApiClient.cs`, `Program.cs`, `Models.cs` | [BSB ABEYSOORIYA](https://github.com/sithiraabey) |
 | 9 | API client & database · AI locally | `SmartBiteApiClient.cs`, `Models.cs`, `Program.cs`, `AppDbContext.cs`, `AIService.cs`, `AICoach.razor` | [Sachitha Rathnayaka](https://github.com/ZeroTrace0245) |
 | 10 | Database design & SQL | `AppDbContext.cs`, `Models.cs`, `Program.cs` (SQLite config + seed data) | [AMGG ADHIKARI](https://github.com/gihangimnath2003-glitch) |
+| 11 | Installer & Packaging | `Build-Installer.ps1`, `MSI-Installer/`, WiX source files | [Sachitha Rathnayaka](https://github.com/ZeroTrace0245) |
+| 12 | Payment Integration | `PaymentModal.razor`, `ThirdPartyPayment.razor`, `UserSession.cs` (payment preferences) | [Sachitha Rathnayaka](https://github.com/ZeroTrace0245) |
+
+---
+
+### Installer & Packaging Development
+**Goal**: Maintain and improve the professional installation packages for SmartBit.
+
+| File | Purpose |
+| --- | --- |
+| `Build-Installer.ps1` | Main build script for portable ZIP package |
+| `MSI-Installer/SmartBit.wxs` | WiX source file for MSI creation |
+| `Create-MSI-Installer.ps1` | Automated MSI build script |
+| `Create-InnoSetup-Installer.ps1` | Alternative Inno Setup installer script |
+| `Create-SFX-Installer.ps1` | Self-extracting archive creator |
+| `MSI-INSTALLER-COMPLETE.md` | Installation and deployment guide |
+| `MSI-INSTALLER-GUIDE.md` | Installer creation guide |
+
+#### Prerequisites for Installer Development
+```powershell
+# Install WiX Toolset v3
+winget install WiXToolset.WiXToolset
+
+# Optional: Install Inno Setup
+winget install JRSoftware.InnoSetup
+```
+
+#### Building Installers
+```powershell
+# Step 1: Build application package
+.\Build-Installer.ps1
+
+# Step 2: Compile MSI
+& "C:\Program Files (x86)\WiX Toolset v3.14\bin\candle.exe" `
+    ".\MSI-Installer\SmartBit.wxs" `
+    -out ".\MSI-Installer\SmartBit.wixobj" `
+    -ext WixUIExtension -arch x64
+
+# Step 3: Link to MSI
+& "C:\Program Files (x86)\WiX Toolset v3.14\bin\light.exe" `
+    ".\MSI-Installer\SmartBit.wixobj" `
+    -out ".\MSI-Installer\Output\SmartBit-v1.0-Setup.msi" `
+    -ext WixUIExtension -cultures:en-us -sval
+```
+
+#### Installer Development Tasks
+- [ ] Update version numbers in WiX source when releasing
+- [ ] Test silent installation on clean VMs
+- [ ] Verify uninstaller removes all files
+- [ ] Test upgrade scenarios (old version → new version)
+- [ ] Optimize MSI package size
+- [ ] Add digital signature support
+- [ ] Create installer localization for multiple languages
+
+### Payment Integration Development
+**Goal**: Maintain and expand payment method integration features.
+
+| File | Purpose |
+| --- | --- |
+| `computer_project.Web/Components/Pages/PaymentModal.razor` | Payment method selection UI component |
+| `computer_project.Web/Components/Pages/ThirdPartyPayment.razor` | PayPal and Stripe integration simulation |
+| `computer_project.Web/Components/Pages/Settings.razor` | Payment preferences configuration |
+| `computer_project.Web/Services/UserSession.cs` | PreferredPaymentMethod property |
+| `PAYMENT_ENHANCEMENT_GUIDE.md` | Payment feature documentation |
+
+#### Payment Development Tasks
+- [ ] Implement real PayPal SDK integration
+- [ ] Implement real Stripe Checkout integration
+- [ ] Add payment history tracking
+- [ ] Add receipt generation
+- [ ] Add refund/cancellation support
+- [ ] Improve payment method validation
+- [ ] Add cryptocurrency payment options
+
+---
+
+## Coding Standards
+
+### C# Style Guidelines
+- Follow [Microsoft C# Coding Conventions](https://docs.microsoft.com/en-us/dotnet/csharp/fundamentals/coding-style/coding-conventions)
+- Use meaningful variable names
+- Add XML documentation comments for public APIs
+- Keep methods focused and under 50 lines when possible
+
+### Razor Component Guidelines
+- Use `@code` blocks for component logic
+- Keep presentation logic in the `.razor` file
+- Move complex business logic to services
+- Use dependency injection for services
+- Implement proper disposal for `IDisposable` components
+
+### PowerShell Script Guidelines
+- Use approved verbs (Get, Set, New, Remove, etc.)
+- Include parameter validation
+- Add help comments at script start
+- Use Write-Host with colors for user feedback
+- Test scripts on clean PowerShell 5.1 and 7+
+
+### Git Commit Messages
+- Use present tense ("Add feature" not "Added feature")
+- First line: brief summary (50 chars or less)
+- Blank line, then detailed description if needed
+- Reference issue numbers: `Fixes #123`
+
+Examples:
+```
+Add MSI installer build script
+
+- Create WiX source file for SmartBit
+- Add automated build pipeline
+- Include silent installation support
+
+Fixes #45
+```
+
+---
+
+## Testing Guidelines
+
+### Manual Testing Checklist
+Before submitting a PR, test:
+- [ ] Application builds without errors
+- [ ] Application runs successfully
+- [ ] UI renders correctly in both light and dark themes
+- [ ] Responsive layout works on mobile/tablet viewports
+- [ ] All navigation links work
+- [ ] Database operations complete successfully
+- [ ] No console errors in browser dev tools
+
+### Installer Testing Checklist
+- [ ] MSI installs successfully
+- [ ] Application launches from Start Menu shortcut
+- [ ] Application launches from Desktop shortcut
+- [ ] Application runs correctly when installed
+- [ ] Uninstaller removes all files
+- [ ] Silent installation works (`/quiet` flag)
+- [ ] Installation log shows no errors
+
+---
+
+## Pull Request Process
+
+1. **Create Feature Branch**
+   ```bash
+   git checkout -b feature/your-feature-name
+   ```
+
+2. **Make Changes**
+   - Follow coding standards
+   - Test thoroughly
+   - Update documentation
+
+3. **Commit Changes**
+   ```bash
+   git add .
+   git commit -m "Add your feature description"
+   ```
+
+4. **Push to GitHub**
+   ```bash
+   git push origin feature/your-feature-name
+   ```
+
+5. **Create Pull Request**
+   - Use descriptive title
+   - Describe what changed and why
+   - Link related issues
+   - Request review from team members
+
+6. **Code Review**
+   - Address reviewer comments
+   - Make requested changes
+   - Re-request review when ready
+
+7. **Merge**
+   - Squash commits if needed
+   - Delete branch after merge
+
+---
+
+## Documentation Standards
+
+### When to Update Documentation
+
+Update docs when you:
+- Add a new feature
+- Change existing behavior
+- Add/remove dependencies
+- Modify installation process
+- Change build procedures
+
+### Documentation Files to Update
+
+| File | When to Update |
+| --- | --- |
+| `README.md` | Major features, system requirements, getting started |
+| `CONTRIBUTING.md` | Contribution process, team member responsibilities |
+| `MSI-INSTALLER-COMPLETE.md` | Installation instructions, deployment options |
+| `MSI-INSTALLER-GUIDE.md` | Installer build process |
+| `PAYMENT_ENHANCEMENT_GUIDE.md` | Payment features, integration steps |
+
+---
+
+## Getting Help
+
+### Resources
+- **Project Documentation**: Check `.md` files in repository root
+- **GitHub Issues**: [SmartBit Issues](https://github.com/ZeroTrace0245/SmartBit/issues)
+- **GitHub Discussions**: [SmartBit Discussions](https://github.com/ZeroTrace0245/SmartBit/discussions)
+- **.NET Documentation**: [docs.microsoft.com/dotnet](https://docs.microsoft.com/dotnet)
+- **Blazor Documentation**: [docs.microsoft.com/blazor](https://docs.microsoft.com/blazor)
+- **WiX Toolset**: [wixtoolset.org](https://wixtoolset.org)
+
+### Team Communication
+- Use GitHub Issues for bug reports and feature requests
+- Use GitHub Discussions for questions and general discussion
+- Tag team members in comments using `@username`
+
+---
+
+## License
+
+By contributing to SmartBit, you agree that your contributions will be licensed under the MIT License.
+
+---
+
+**Thank you for contributing to SmartBit!** 🎉

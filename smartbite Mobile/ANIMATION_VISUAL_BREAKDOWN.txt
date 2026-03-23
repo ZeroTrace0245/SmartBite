@@ -1,0 +1,255 @@
+/**
+ * ANIMATION BREAKDOWN - WHAT YOU'LL SEE
+ */
+
+════════════════════════════════════════════════════════════════════
+STAT CARD ANIMATION (Meals Logged, Water Consumed, etc.)
+════════════════════════════════════════════════════════════════════
+
+Visual Effect:
+┌─────────────────────────────────────┐
+│  Meals logged          ✨ (Glowing) │
+│  1                     ✨ (Glowing) │
+│                                     │
+│  ✨ Pulsing glow effect ✨          │
+└─────────────────────────────────────┘
+
+Animation Timeline (1.5 second cycle):
+- 0.0s: Soft glow (alpha 0.3)
+- 0.75s: Medium glow (alpha 0.55)
+- 1.5s: Bright glow (alpha 0.8)
+- 1.5s→3.0s: Fades back to soft
+
+What happens:
+• Border glows brighter and dimmer
+• Shadow grows and shrinks
+• Creates "breathing" effect
+• Keeps repeating infinitely
+
+Color Used:
+- Gym: Red border fading to blue
+- Diet: Green border fading to blue
+- Wellness: Purple border fading to blue
+
+
+════════════════════════════════════════════════════════════════════
+FEATURE CARD ANIMATION (Auto Weekly Meal Plan, etc.)
+════════════════════════════════════════════════════════════════════
+
+Visual Effect:
+┌─────────────────────────────────────┐
+│ Auto Weekly Meal Plan    💫 Shimmer │
+│ A 7-day meal plan is generated...   │
+│ Target adherence: 91%               │
+└─────────────────────────────────────┘
+   ↓ (Shimmer flows downward)
+
+Animation Timeline (2 second cycle):
+- 0.0s: Shimmer at top (-1 position)
+- 1.0s: Shimmer at middle (0 position)
+- 2.0s: Shimmer at bottom (+1 position)
+- 2.0s→4.0s: Repeats
+
+What happens:
+• Shimmer line flows from top to bottom
+• Border pulses while shimmer flows
+• Creates dynamic, flowing effect
+• Makes the card feel "alive"
+
+Color Used:
+- Same gradient as stat cards
+- Creates unified visual language
+
+
+════════════════════════════════════════════════════════════════════
+BUTTON ANIMATION (Sync Now, Pathway Preferences)
+════════════════════════════════════════════════════════════════════
+
+Visual Effect:
+┌───────────────────────────────────┐
+│     Sync now ✨ (Glowing)        │
+└───────────────────────────────────┘
+
+Animation Timeline (1 second cycle):
+- 0.0s: Soft glow (alpha 0.4)
+- 0.5s: Bright glow (alpha 1.0)
+- 1.0s: Soft glow (alpha 0.4)
+- Repeats
+
+What happens:
+• Button border pulses
+• Shadow grows and shrinks
+• Attracts user attention
+• Creates urgency to click
+• Very smooth pulsing effect
+
+Color Used:
+- Button background: Gradient start color (solid)
+- Glow: Same gradient colors (animated alpha)
+
+
+════════════════════════════════════════════════════════════════════
+BACKGROUND ANIMATION
+════════════════════════════════════════════════════════════════════
+
+Visual Effect:
+Dark Navy Gradient Background
+(Static, non-animated - provides contrast for cards)
+
+Colors:
+- Top: #0A0E27 (Very dark navy)
+- Bottom: #1A1F3A (Dark navy with slight purple)
+
+Purpose:
+• Provides visual depth
+• Makes glowing cards stand out
+• Reduces eye strain
+• Professional dark theme look
+
+
+════════════════════════════════════════════════════════════════════
+COMBINED EFFECT (All together)
+════════════════════════════════════════════════════════════════════
+
+When viewing the Dashboard:
+1. Dark background sets the mood
+2. Stat cards have gentle pulsing glow
+3. Feature cards have flowing shimmer
+4. Buttons pulse with urgency
+5. All animations are in sync but different speeds
+6. Creates a premium, polished feel
+
+Frame-by-frame example (Diet Pathway):
+
+Frame 1 (0s):
+┌─ (Soft glow, shimmer at top)
+│
+├─ Meals logged: 1
+├─ Water: 1500ml
+├─ Shopping: 1
+│
+├─ [Sync now] ✓
+├─ [Pathway pref] ✓
+│
+├─ Diet Planning Dashboard
+│
+├─ Auto Weekly Meal Plan (shimmer flowing)
+│  Target adherence: 91% ✓
+
+Frame 2 (0.5s):
+┌─ (Medium glow)
+│
+├─ Meals logged: 1
+├─ Water: 1500ml
+├─ Shopping: 1
+│
+├─ [Sync now] (brighter glow)
+├─ [Pathway pref] (brighter glow)
+│
+├─ Diet Planning Dashboard
+│
+├─ Auto Weekly Meal Plan (shimmer in middle)
+│  Target adherence: 91%
+
+Frame 3 (1.0s):
+┌─ (Bright glow)
+│
+├─ Meals logged: 1
+├─ Water: 1500ml
+├─ Shopping: 1
+│
+├─ [Sync now] ✓
+├─ [Pathway pref] ✓
+│
+├─ Diet Planning Dashboard
+│
+├─ Auto Weekly Meal Plan (shimmer at bottom)
+│  Target adherence: 91%
+
+Frame 4 (1.5s):
+┌─ (Fading back to soft)
+│
+[Cycle repeats...]
+
+
+════════════════════════════════════════════════════════════════════
+PERFORMANCE METRICS
+════════════════════════════════════════════════════════════════════
+
+Animations per screen: 3 main types
+- Stat cards: 3 × (1.5s pulsing) = 3 active animations
+- Feature cards: 4 × (2s shimmer) = 4 active animations
+- Buttons: 2 × (1s pulsing) = 2 active animations
+
+Total: 9 concurrent animations
+GPU Impact: Minimal (uses only shadow and alpha)
+CPU Impact: Minimal (uses compose optimization)
+Battery Impact: Negligible
+
+Result: Smooth 60fps animations
+
+
+════════════════════════════════════════════════════════════════════
+HOW TO CUSTOMIZE THE ANIMATIONS
+════════════════════════════════════════════════════════════════════
+
+In DashboardScreen.kt:
+
+1. Change stat card glow speed:
+   animation = tween(1500, easing = EaseInOutCubic)
+   ↓
+   animation = tween(1000, easing = EaseInOutCubic)  // Faster
+   animation = tween(2000, easing = EaseInOutCubic)  // Slower
+
+2. Change glow intensity:
+   initialValue = 0.3f, targetValue = 0.8f
+   ↓
+   initialValue = 0.1f, targetValue = 0.9f  // More intense
+
+3. Change shadow elevation:
+   elevation = 12.dp
+   ↓
+   elevation = 20.dp  // Bigger shadow
+
+4. Change border thickness:
+   width = 1.5.dp
+   ↓
+   width = 3.dp  // Thicker border
+
+5. Disable an animation:
+   // Comment out the entire Box with shadow modifier
+
+
+════════════════════════════════════════════════════════════════════
+PATHWAY COLOR EXAMPLES
+════════════════════════════════════════════════════════════════════
+
+GYM PATHWAY (Red → Blue):
+┌────────────────────────────────┐
+│ Stat: RED border pulsing      │
+│ Feature: RED shimmer flowing  │
+│ Button: RED background glowing│
+└────────────────────────────────┘
+Colors: #E63946 (Red) → #457B9D (Blue)
+
+DIET PATHWAY (Green → Blue):
+┌────────────────────────────────┐
+│ Stat: GREEN border pulsing    │
+│ Feature: GREEN shimmer flowing│
+│ Button: GREEN background glow │
+└────────────────────────────────┘
+Colors: #06A77D (Green) → #1F5A8E (Blue)
+
+WELLNESS PATHWAY (Purple → Blue):
+┌────────────────────────────────┐
+│ Stat: PURPLE border pulsing   │
+│ Feature: PURPLE shimmer flow  │
+│ Button: PURPLE background glow│
+└────────────────────────────────┘
+Colors: #7D3C98 (Purple) → #457B9D (Blue)
+
+
+════════════════════════════════════════════════════════════════════
+END OF ANIMATION BREAKDOWN
+════════════════════════════════════════════════════════════════════
+

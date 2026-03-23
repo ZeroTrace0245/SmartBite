@@ -1,5 +1,5 @@
-using Microsoft.EntityFrameworkCore;
 using computer_project.ApiService.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace computer_project.ApiService.Data;
 
@@ -17,19 +17,31 @@ public class AppDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        base.OnModelCreating(modelBuilder);
-        // Seed some data for demo purposes
-        modelBuilder.Entity<User>().HasData(new User { Id = 1, Username = "admin", PasswordHash = "admin", Role = "Admin" });
-        modelBuilder.Entity<UserGoal>().HasData(new UserGoal 
-        { 
-            Id = 1, 
-            UserId = 1, 
-            TargetCalories = 2000, 
-            TargetProtein = 150, 
-            TargetCarbs = 200, 
-            TargetFat = 70, 
-            TargetWater = 2.5 
+        modelBuilder.Entity<Meal>(e =>
+        {
+            e.HasIndex(m => m.UserId);
+            e.HasIndex(m => m.LoggedAt);
         });
+
+        modelBuilder.Entity<WaterIntake>(e =>
+        {
+            e.HasIndex(w => w.UserId);
+            e.HasIndex(w => w.LoggedAt);
+        });
+
+        modelBuilder.Entity<ShoppingListItem>()
+            .HasIndex(s => s.UserId);
+
+        modelBuilder.Entity<HealthReport>()
+            .HasIndex(h => h.UserId);
+
+        modelBuilder.Entity<UserGoal>()
+            .HasIndex(g => g.UserId)
+            .IsUnique();
+
+        modelBuilder.Entity<User>()
+            .HasIndex(u => u.Username)
+            .IsUnique();
     }
 }
 
