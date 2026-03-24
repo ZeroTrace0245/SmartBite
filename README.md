@@ -2,7 +2,15 @@
 
 SmartBite is a Blazor Server health and fitness companion built on .NET 11.
 
-> ⚠️ **Requires .NET 10 or .NET 11 Preview SDK.** Earlier SDK versions are not supported.
+---
+To run locally
+
+> **.NET 10** or **.NET 11 Preview SDK** _(Earlier SDK versions are not supported)_
+> **Docker** must be installed
+
+### ℹ️ Notes
+- If you encounter a migration error, it is **not critical** and can be safely ignored.
+---
 
 > To test out the mobile version (Android only) please visit to the [Release Page](https://github.com/ZeroTrace0245/SmartBite/releases/tag/v0.1.3-alpha)
 
