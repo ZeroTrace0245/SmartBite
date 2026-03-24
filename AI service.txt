@@ -1,2 +1,0 @@
-foundry model run phi-3.5-mini
-foundry service stop
