@@ -53,6 +53,10 @@ Pathway-specific personalization (Gym, Diet, General/Wellness) was introduced, a
 - Figure 8: Azure Hosting Evidence (`screenshots/Web app NEW/Azure.png`)
 - Figure 9: Mobile Pathway Dashboards (`screenshots/Mobile app/Mobile Pathway Dashboard ...`)
 - Figure 10: Mobile AI Coach (`screenshots/Mobile app/Mobile AI Coach .png`)
+- Figure 11: Pathway Decision Flow Diagram (`Appendix I`)
+- Figure 12: SmartBite ER Diagram (`Appendix I`)
+- Figure 13: User Interaction / Use-Case Diagram (`Appendix I`)
+- Figure 14: High-Level Architecture Diagram (`Appendix I`)
 
 ### Tables
 - Table 1: Functional Requirements  
@@ -738,3 +742,189 @@ Use subsection numbering when embedding screenshots in the final PDF/Word export
 - 5.6.3 Mobile tracker and settings screenshots
 
 This report body remains self-contained. Detailed raw evidence should be placed in appendices and cross-cited in relevant sections.
+
+---
+
+### Appendix I — Additional Diagrams (Pathway / ER / User)
+
+#### I.1 Pathway Decision Flow Diagram
+```mermaid
+flowchart TD
+    A([User Login]) --> B{Role Type?}
+    B -->|Admin| C[Admin Settings / Management]
+    B -->|End User| D[Pathway Selection]
+
+    D --> E{Selected Pathway}
+    E -->|Gym| F[Gym Dashboard]
+    E -->|Diet| G[Diet Dashboard]
+    E -->|General/Wellness| H[General Dashboard]
+
+    F --> I[Meal Logging]
+    F --> J[Water Tracking]
+    F --> K[AI Coach]
+    F --> L[Reports]
+
+    G --> I
+    G --> J
+    G --> K
+    G --> L
+
+    H --> I
+    H --> J
+    H --> K
+    H --> L
+
+    I --> M[(PostgreSQL)]
+    J --> M
+    L --> M
+    K --> N[AIService / GitHub Models]
+```
+
+#### I.2 SmartBite ER Diagram
+```mermaid
+erDiagram
+    USER {
+        int UserId PK
+        string Email
+        string PasswordHash
+        string Role
+        string Pathway
+        datetime CreatedAt
+    }
+
+    USER_GOAL {
+        int GoalId PK
+        int UserId FK
+        int DailyCalorieTarget
+        int DailyWaterTargetMl
+        int DailyStepTarget
+        datetime UpdatedAt
+    }
+
+    MEAL {
+        int MealId PK
+        int UserId FK
+        string MealName
+        int Calories
+        int Protein
+        int Carbs
+        int Fat
+        datetime LoggedAt
+    }
+
+    WATER_INTAKE {
+        int WaterIntakeId PK
+        int UserId FK
+        int AmountMl
+        datetime LoggedAt
+    }
+
+    SHOPPING_LIST_ITEM {
+        int ItemId PK
+        int UserId FK
+        string ItemName
+        int Quantity
+        boolean IsPurchased
+        datetime CreatedAt
+    }
+
+    HEALTH_REPORT {
+        int ReportId PK
+        int UserId FK
+        string Summary
+        string AiInsights
+        datetime GeneratedAt
+    }
+
+    USER ||--o{ USER_GOAL : sets
+    USER ||--o{ MEAL : logs
+    USER ||--o{ WATER_INTAKE : tracks
+    USER ||--o{ SHOPPING_LIST_ITEM : manages
+    USER ||--o{ HEALTH_REPORT : receives
+```
+
+#### I.3 User Interaction (Use-Case Style) Diagram
+```mermaid
+flowchart LR
+    EndUser([End User])
+    Admin([Admin])
+    AI([AI Service])
+
+    U1((Register / Login))
+    U2((Select Pathway))
+    U3((Log Meals))
+    U4((Track Water))
+    U5((Manage Shopping List))
+    U6((View Reports / Export CSV))
+    U7((Chat with AI Coach))
+    U8((Manage System Settings))
+
+    EndUser --> U1
+    EndUser --> U2
+    EndUser --> U3
+    EndUser --> U4
+    EndUser --> U5
+    EndUser --> U6
+    EndUser --> U7
+
+    Admin --> U1
+    Admin --> U8
+
+    U3 -. AI extraction .-> AI
+    U4 -. AI estimation .-> AI
+    U6 -. AI insights .-> AI
+    U7 -. conversation .-> AI
+```
+
+#### I.4 High-Level Architecture Diagram
+```mermaid
+flowchart LR
+    subgraph ClientLayer[Client Layer]
+        Web[Blazor Web App\ncomputer_project.Web]
+        Mobile[Android App\nKotlin + Compose]
+    end
+
+    subgraph EdgeLayer[Edge / API Layer]
+        Api[Minimal API Service\ncomputer_project.ApiService]
+    end
+
+    subgraph ServiceLayer[Application Services]
+        Auth[Auth & Session Logic]
+        Tracking[Tracking Modules\nMeals/Water/Shopping]
+        Reports[Reports & Analytics]
+        AIAgent[AIService\nGitHub Models Integration]
+    end
+
+    subgraph DataLayer[Data & Infrastructure]
+        Pg[(PostgreSQL\nsmartbitedb)]
+        Redis[(Redis Cache)]
+    end
+
+    subgraph OpsLayer[Orchestration & Hosting]
+        Aspire[.NET Aspire AppHost\ncomputer_project.AppHost]
+        Azure[Azure Container Apps]
+    end
+
+    Web --> Api
+    Mobile --> Api
+
+    Api --> Auth
+    Api --> Tracking
+    Api --> Reports
+    Api --> AIAgent
+
+    Tracking --> Pg
+    Reports --> Pg
+    Auth --> Pg
+    Api --> Redis
+
+    AIAgent --> Api
+
+    Aspire --> Web
+    Aspire --> Api
+    Aspire --> Redis
+    Aspire --> Pg
+
+    Web --> Azure
+    Api --> Azure
+```
