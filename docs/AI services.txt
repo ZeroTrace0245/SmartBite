@@ -1,0 +1,31 @@
++-------------------+         +---------------------+         +---------------------+
+|   Blazor UI       |  <----> |  API Controller     |  <----> |     AIService       |
+| (Blazor Page)     |  calls  | (AIRecommendation)  |  calls  | (GenerateRecommendation) |
++-------------------+         +---------------------+         +---------------------+
+        |                              |                                 |
+        | 1. User requests             |                                 |
+        |    recommendation            |                                 |
+        |----------------------------->|                                 |
+        |                              |                                 |
+        |         2. API receives      |                                 |
+        |            user goal & meals |                                 |
+        |<-----------------------------|                                 |
+        |                              |                                 |
+        |         3. Calls AIService   |                                 |
+        |            with data         |                                 |
+        |----------------------------->|                                 |
+        |                              |                                 |
+        |         4. AIService         |                                 |
+        |            processes data    |                                 |
+        |            and returns       |                                 |
+        |            recommendation    |                                 |
+        |<-----------------------------|                                 |
+        |                              |                                 |
+        |         5. API returns       |                                 |
+        |            recommendation    |                                 |
+        |----------------------------->|                                 |
+        |                              |                                 |
+        |         6. UI displays       |                                 |
+        |            suggestion        |                                 |
+        |<-----------------------------|                                 |
++-------------------+         +---------------------+         +---------------------+
