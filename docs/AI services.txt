@@ -1,3 +1,13 @@
+# AI Recommendation Feature – Project Flow
+
+## Overview
+This document explains the AI recommendation feature in your Blazor project, including the code flow, key files, and how ASP.NET Core manages the process.
+
+---
+
+## Architecture Diagram
+
+```
 +-------------------+         +---------------------+         +---------------------+
 |   Blazor UI       |  <----> |  API Controller     |  <----> |     AIService       |
 | (Blazor Page)     |  calls  | (AIRecommendation)  |  calls  | (GenerateRecommendation) |
@@ -29,3 +39,59 @@
         |            suggestion        |                                 |
         |<-----------------------------|                                 |
 +-------------------+         +---------------------+         +---------------------+
+```
+
+---
+
+## Key Files and Code Flow
+
+### 1. Blazor UI Calls API
+```csharp
+// Example: Blazor page calls the API to get a recommendation
+var response = await Http.PostAsJsonAsync("api/AIRecommendation", new {
+    Goal = userGoal,
+    RecentMeals = recentMeals
+});
+var recommendation = await response.Content.ReadFromJsonAsync<AIRecommendation>();
+```
+
+### 2. API Controller Receives Request
+```csharp
+[HttpPost]
+public ActionResult<AIRecommendation> Post([FromBody] AIRecommendationRequest request)
+{
+    var recommendation = _aiService.GenerateRecommendation(request.Goal, request.RecentMeals);
+    return Ok(recommendation);
+}
+```
+
+### 3. AIService Uses Models
+```csharp
+public AIRecommendation GenerateRecommendation(UserGoal goal, IEnumerable<Meal> recentMeals)
+{
+    // Logic using UserGoal and Meal models
+    return new AIRecommendation { ... };
+}
+```
+
+### 4. Models Define Data
+```csharp
+public class AIRecommendation { ... }
+public class UserGoal { ... }
+public class Meal { ... }
+```
+
+---
+
+## ASP.NET Core (Aspire) Management
+- Handles routing, dependency injection, and model binding.
+- You define controllers, services, and models; the framework manages the rest.
+
+---
+
+## Summary
+- The Blazor UI sends user data to the API.
+- The API controller receives the request and calls the AIService.
+- The AIService processes the data and returns a recommendation.
+- The UI displays the recommendation to the user.
+- ASP.NET Core manages the flow, making integration seamless.
