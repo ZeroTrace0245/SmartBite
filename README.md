@@ -14,7 +14,7 @@ To run locally
 
 > To test out the mobile version (Android only) please visit to the [Release Page](https://github.com/ZeroTrace0245/SmartBite/releases/tag/v0.1.3-alpha)
 
-> To test out the web application please visit to the [SmartBite web page](https://webfrontend--0000001.livelywater-c20b023f.southeastasia.azurecontainerapps.io/)
+> To test out the web application please visit to the [SmartBite web page](https://webfrontend--0000001.livelyocean-b152e716.southeastasia.azurecontainerapps.io/)
 
 It combines nutrition tracking, hydration, goals, shopping flow, pathway-based dashboards, and AI-assisted coaching in a single app.
 
