@@ -1,6 +1,6 @@
 # SmartBite
 
-⚠️ Availability note: this demo may be temporarily offline because it is hosted using Azure student benefits linked to a university account.
+>⚠️this demo may be offline because it is hosted using Azure student benefits linked to a university account.
 
 SmartBite is a Blazor Server health and fitness companion built on .NET 11.
 
