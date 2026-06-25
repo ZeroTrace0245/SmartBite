@@ -1,6 +1,6 @@
 # SmartBite
 
->⚠️this demo may be offline because it is hosted using Azure student benefits linked to a university account.
+>⚠️ this demo may be offline because it is hosted using Azure student benefits linked to a university account.
 
 SmartBite is a Blazor Server health and fitness companion built on .NET 11.
 
@@ -53,7 +53,7 @@ It combines nutrition tracking, hydration, goals, shopping flow, pathway-based d
 - AI Coach chat (`/ai`)
 - Meal nutrition estimation (`/ai/estimate`)
 - AI recommendations (`/recommendations`)
-- AI-generated health summaries (`/stats`)
+- AI generated health summaries (`/stats`)
 - AI health status endpoint (`/ai/status`)
 
 ## 🏗️ Architecture
@@ -142,6 +142,89 @@ You can test the hosted app here:
 - `GET /ai/status`
 - `GET /recommendations`
 
+### 🤖 AI Features Showcase
+
+#### 🌐 Web AI Features
+
+| AI Feature | Screenshot |
+| --- | --- |
+| AI Coach | ![Web AI coach](<screenshots/Web app NEW/New AI coach.png>) |
+| AI Dashboard Insights | ![Web AI dashboard](<screenshots/Web app NEW/New AI feature for the dashboard.png>) |
+| AI Meal Assist | ![Web AI meal](<screenshots/Web app NEW/AI features for the Log meal.png>) |
+| AI Grocery Assist | ![Web AI groceries](<screenshots/Web app NEW/AI features for groceries.png>) |
+| AI Grocery Autofill | ![Web AI grocery autofill](<screenshots/Web app NEW/auto fill groceries with AI.png>) |
+| AI Hydration Assist | ![Web AI hydration](<screenshots/Web app NEW/New Hydration AI feature.png>) |
+| AI Performance Insight | ![Web AI performance](<screenshots/Web app NEW/AI insight for performance.png>) |
+| AI Help & Support | ![Web AI help](<screenshots/Web app NEW/Help and support with AI.png>) |
+
+## 🤖 Mobile AI Feature Setup (Token)
+
+For mobile AI features, configure **your own GitHub token** locally.
+
+- ✅ Use your personal token in local secrets/environment settings
+- ❌ Do not commit tokens to source control
+- 🔐 Do not share tokens in chat, issues, or screenshots
+
+Example secret key used by this solution:
+
+- `Parameters:chatModel-Token`
+
+## 📁 Project File Structure
+
+```text
+.
+├─ computer_project.Web/
+│  ├─ Components/
+│  │  ├─ Layout/
+│  │  └─ Pages/
+│  ├─ Services/
+│  ├─ Program.cs
+│  ├─ SmartBiteApiClient.cs
+│  └─ Models.cs
+├─ computer_project.ApiService/
+│  ├─ Data/
+│  │  └─ AppDbContext.cs
+│  ├─ Services/
+│  │  └─ AIService.cs
+│  ├─ Program.cs
+│  └─ Models.cs
+├─ computer_project.ServiceDefaults/
+│  └─ Extensions.cs
+├─ computer_project.AppHost/
+│  └─ (Aspire host project files)
+├─ screenshots/
+├─ docs/
+└─ README.md
+```
+
+## ⚠️ Current Known Limitations
+
+- Demo-style authentication (passwords are not hashed yet)
+- Most demo flows are centered around seeded/default data
+- No dedicated automated test project yet
+- Some integrations (wearable polling / advanced labs) are scaffolded or simulated
+
+## 🗂️ Repository Structure
+
+```text
+.
+├─ computer_project.Web/
+├─ computer_project.ApiService/
+├─ computer_project.ServiceDefaults/
+├─ computer_project.AppHost/
+├─ docs/
+├─ screenshots/
+└─ README.md
+```
+
+## 🤝 Contributing
+
+Please follow [CONTRIBUTING.md](CONTRIBUTING.md).
+
+## 📄 License
+
+MIT - see [LICENSE.md](LICENSE.md).
+
 ## 📸 Screenshots
 
 ### Web app (Old vs New)
@@ -211,20 +294,6 @@ You can test the hosted app here:
 | Mood/Utility View | ![Mobile settings pathway theme](<screenshots/Mobile app/Mobile change the pathway theme only.png>) |
 | Pathway Selection | ![Mobile pathway selection](<screenshots/Mobile app/Mobile Pathway selection.png>) |
 
-### 🤖 AI Features Showcase
-
-#### 🌐 Web AI Features
-
-| AI Feature | Screenshot |
-| --- | --- |
-| AI Coach | ![Web AI coach](<screenshots/Web app NEW/New AI coach.png>) |
-| AI Dashboard Insights | ![Web AI dashboard](<screenshots/Web app NEW/New AI feature for the dashboard.png>) |
-| AI Meal Assist | ![Web AI meal](<screenshots/Web app NEW/AI features for the Log meal.png>) |
-| AI Grocery Assist | ![Web AI groceries](<screenshots/Web app NEW/AI features for groceries.png>) |
-| AI Grocery Autofill | ![Web AI grocery autofill](<screenshots/Web app NEW/auto fill groceries with AI.png>) |
-| AI Hydration Assist | ![Web AI hydration](<screenshots/Web app NEW/New Hydration AI feature.png>) |
-| AI Performance Insight | ![Web AI performance](<screenshots/Web app NEW/AI insight for performance.png>) |
-| AI Help & Support | ![Web AI help](<screenshots/Web app NEW/Help and support with AI.png>) |
 
 #### 📱 Mobile AI Features
 
@@ -260,71 +329,3 @@ You can test the hosted app here:
 | Settings (Part 2) | ![Mobile settings 2](<screenshots/Mobile app/Mobile settings 2.png>) |
 | Settings (Part 3) | ![Mobile settings 3](<screenshots/Mobile app/Mobile settings 3.png>) |
 | Pathway theme switch | ![Mobile pathway theme switch](<screenshots/Mobile app/Mobile change the pathway theme only.png>) |
-
-## 🤖 Mobile AI Feature Setup (Token)
-
-For mobile AI features, configure **your own GitHub token** locally.
-
-- ✅ Use your personal token in local secrets/environment settings
-- ❌ Do not commit tokens to source control
-- 🔐 Do not share tokens in chat, issues, or screenshots
-
-Example secret key used by this solution:
-
-- `Parameters:chatModel-Token`
-
-## 📁 Project File Structure
-
-```text
-.
-├─ computer_project.Web/
-│  ├─ Components/
-│  │  ├─ Layout/
-│  │  └─ Pages/
-│  ├─ Services/
-│  ├─ Program.cs
-│  ├─ SmartBiteApiClient.cs
-│  └─ Models.cs
-├─ computer_project.ApiService/
-│  ├─ Data/
-│  │  └─ AppDbContext.cs
-│  ├─ Services/
-│  │  └─ AIService.cs
-│  ├─ Program.cs
-│  └─ Models.cs
-├─ computer_project.ServiceDefaults/
-│  └─ Extensions.cs
-├─ computer_project.AppHost/
-│  └─ (Aspire host project files)
-├─ screenshots/
-├─ docs/
-└─ README.md
-```
-
-## ⚠️ Current Known Limitations
-
-- Demo-style authentication (passwords are not hashed yet)
-- Most demo flows are centered around seeded/default data
-- No dedicated automated test project yet
-- Some integrations (wearable polling / advanced labs) are scaffolded or simulated
-
-## 🗂️ Repository Structure
-
-```text
-.
-├─ computer_project.Web/
-├─ computer_project.ApiService/
-├─ computer_project.ServiceDefaults/
-├─ computer_project.AppHost/
-├─ docs/
-├─ screenshots/
-└─ README.md
-```
-
-## 🤝 Contributing
-
-Please follow [CONTRIBUTING.md](CONTRIBUTING.md).
-
-## 📄 License
-
-MIT - see [LICENSE.md](LICENSE.md).
