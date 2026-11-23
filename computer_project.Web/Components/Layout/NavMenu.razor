@@ -1,6 +1,7 @@
 @using computer_project.Web.Services
 @inject UserSession Session
 @inject NavigationManager Navigation
+@implements IDisposable
 
 <div class="d-flex flex-column h-100 pb-3">
     <div class="top-row ps-4 navbar navbar-dark d-flex align-items-center mb-4">
@@ -21,16 +22,13 @@
                 </NavLink>
             </div>
 
-            <div class="mt-4 px-3 mb-2 small text-white-50 text-uppercase fw-bold ls-wider opacity-50" style="font-size: 10px;">@Session.CurrentUser?.Pathway Navigation</div>
+            @if (Session.CurrentUser?.Pathway is "Gym" or "Diet")
+            {
+                <div class="mt-4 px-3 mb-2 small text-white-50 text-uppercase fw-bold ls-wider opacity-50" style="font-size: 10px;">@Session.CurrentUser?.Pathway Navigation</div>
+            }
 
             @if (Session.CurrentUser?.Pathway == "Gym")
             {
-                <div class="nav-item">
-                    <NavLink class="nav-link acrylic-effect d-flex align-items-center gap-3" href="workouts">
-                        <i class="bi bi-activity text-danger fs-5"></i>
-                        <span>Workout Vol</span>
-                    </NavLink>
-                </div>
                 <div class="nav-item">
                     <NavLink class="nav-link acrylic-effect d-flex align-items-center gap-3" href="calories">
                         <i class="bi bi-fire text-danger fs-5"></i>
@@ -77,22 +75,13 @@
                     </NavLink>
                 </div>
             }
-            else
+
+            @if (Session.CurrentUser?.Pathway == "Diet")
             {
+                <div class="mt-4 px-3 mb-2 small text-white-50 text-uppercase fw-bold ls-wider opacity-50" style="font-size: 10px;">Quick Access Actions</div>
+                <div class="nav-item"><NavLink class="nav-link acrylic-effect d-flex align-items-center gap-3 text-white" href="meals"><i class="bi bi-journal-plus text-success fs-5"></i><span>Log Meal</span></NavLink></div>
             }
 
-            <div class="mt-4 px-3 mb-2 small text-white-50 text-uppercase fw-bold ls-wider opacity-50" style="font-size: 10px;">Quick Access Actions</div>
-            @if(Session.CurrentUser?.Pathway == "Gym")
-            {
-                <div class="nav-item"><NavLink class="nav-link acrylic-effect d-flex align-items-center gap-3 text-white" href="workouts"><i class="bi bi-fire text-danger fs-5"></i><span>Log Workout</span></NavLink></div>
-                <div class="nav-item"><NavLink class="nav-link acrylic-effect d-flex align-items-center gap-3 text-white" href="supplements"><i class="bi bi-capsule text-danger fs-5"></i><span>Supplements</span></NavLink></div>
-            }
-            else if(Session.CurrentUser?.Pathway == "Diet")
-            {
-                <div class="nav-item"><NavLink class="nav-link acrylic-effect d-flex align-items-center gap-3 text-white" href="meals"><i class="bi bi-journal-plus text-success fs-5"></i><span>Log Meal</span></NavLink></div>
-                <div class="nav-item"><NavLink class="nav-link acrylic-effect d-flex align-items-center gap-3 text-white" href="plans"><i class="bi bi-list-check text-success fs-5"></i><span>New Plan</span></NavLink></div>
-            }
-         
 
             <div class="mt-4 px-3 mb-2 small text-white-50 text-uppercase fw-bold ls-wider opacity-50" style="font-size: 10px;">General</div>
 
@@ -227,6 +216,13 @@
 </div>
 
 @code {
+    // Re-render when the user logs in/out or switches pathway
+    protected override void OnInitialized() => Session.OnChange += OnSessionChanged;
+
+    private void OnSessionChanged() => InvokeAsync(StateHasChanged);
+
+    public void Dispose() => Session.OnChange -= OnSessionChanged;
+
     private void HandleLogout()
     {
         Session.Logout();
